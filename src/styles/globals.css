@@ -1,0 +1,70 @@
+
+
+@keyframes float {
+  0%   { transform: translateY(0px)   rotate(0deg); }
+  33%  { transform: translateY(-12px) rotate(0.4deg); }
+  66%  { transform: translateY(-6px)  rotate(-0.4deg); }
+  100% { transform: translateY(0px)   rotate(0deg); }
+}
+
+.player-float {
+  animation: float 7s ease-in-out infinite;
+}
+
+@keyframes vidSheen {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(300%); }
+}
+
+.stat-bar-fill {
+  transform-origin: left;
+  transform: scaleX(0);   
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track,
+  .player-float {
+    animation: none;
+  }
+}
+
+@media screen and (max-width: 390px){
+  
+  .player-photo { 
+    width: 380px !important;
+    max-width: none !important;
+  }
+  .player-number {
+    font-size: 90px !important;
+    margin-left: 16px !important;
+  }
+  .player-name-container {
+    top: 60px !important;
+  }
+  .player-name {
+    font-size: 47px !important;
+  }
+  .player-fullname {
+    font-size: 80px !important;
+  }
+  .player-info {
+    top: 400px !important;
+    left: 220px !important;
+  }
+  #player-info-text {
+    gap: 2px !important;
+    .text {
+      font-size: 10px !important;
+    }
+  }
+  .hero-bg-center {
+    height: 60vh !important;
+    bottom: 37% !important;
+  }
+  .hero-bg-right {
+    height: 70vh !important;
+    top: 14% !important;
+    right: -15% !important;
+    opacity: 0.45 !important;
+  }
+}
