@@ -64,11 +64,11 @@ export default function Footer() {
             fontWeight="bold"
             textTransform="uppercase"
             fontSize={{ base: '46px', md: '36px' }}
-            letterSpacing="0.08em"
+            letterSpacing="-0.08em"
             color="brand.amber"
           >
             {playerData.initials}
-            <Box as="span" color="brand.dorado" ml="1px">_</Box>
+            <Box as="span" color="brand.dorado" ml="-5px">_</Box>
           </Text>
         </Box>
 
