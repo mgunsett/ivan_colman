@@ -268,12 +268,12 @@ export default function Hero() {
                 fontWeight="bold"
                 letterSpacing="2px"
                 textTransform="uppercase"
-                fontSize={{ base: '12vw', md: '16vw', lg: '5vw' }}
+                fontSize={{ base: '12vw', md: '16vw', lg: '7vw' }}
                 color="brand.amber"
                 lineHeight={0.9}
                 style={{ opacity: 0 }}
                 ml={{ base: 2, md: 0 }}
-                mb={'-5px'}
+                mb={'-7px'}
               >
                 {playerData.name}
               </Text>            
