@@ -102,10 +102,7 @@ export const playerData = {
     { label: 'Visión de Juego',value: 91 },
   ],
 
-  // Estadísticas — diseño "Marcador":
-  //  featured → el número que mejor lo define (recuadro grande con recorte)
-  //  wide     → ocupa dos columnas · tone: 'gold' → recuadro dorado
-  //  order    → posición en tablet/mobile (grilla de 2 columnas, sin huecos)
+  // Estadísticas — 
   seasonStats: [
     { label: 'Asistencias',     value: 21, featured: true,
       caption: 'Asistencias en la temporada',

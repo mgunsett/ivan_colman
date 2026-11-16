@@ -77,11 +77,7 @@ function FeaturedTile({ stat }) {
         <Text fontFamily="heading" fontWeight={700} fontSize="15px" lineHeight={1.2} color="brand.dark">
           {stat.caption ?? stat.label}
         </Text>
-        {stat.text && (
-          <Text fontFamily="body" fontSize="13px" lineHeight={1.55} color="brand.gray2" mt={2}>
-            {stat.text}
-          </Text>
-        )}
+        
       </Box>
       {playerData.featuredImage && (
         <Image
