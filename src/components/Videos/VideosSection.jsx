@@ -12,15 +12,6 @@ import './videos.css'
 
 gsap.registerPlugin(ScrollTrigger)
 
-// ─── Videos: diseño "Programa" ──────────────────────────────────────
-// Un video "en pantalla" con su ficha y la lista para cambiarlo.
-//
-// Todo entra en el alto visible: en desktop el alto de la pantalla
-// (--screen-h) sale del alto del viewport (svh) menos la navbar, el padding y el
-// título, y la columna derecha toma ese mismo alto (si hubiera muchos
-// videos, la lista scrollea por dentro). En mobile el video se achica
-// para entrar completo en pantalla.
-
 const EASE = 'cubic-bezier(0.23,1,0.32,1)'
 const HOVER = '@media (hover: hover) and (pointer: fine)'
 
@@ -43,7 +34,7 @@ function NowPlaying({ video }) {
   const crest = video.clubLogo ?? playerData.logoCurrentClub
   return (
     <Box key={video.id} aria-live="polite"
-         sx={{ animation: `${swapIn} .5s ${EASE} both`, '@media (prefers-reduced-motion: reduce)': { animation: 'none' } }}>
+         sx={{ animation: `${swapIn} .5s ${EASE} both`, '@media (prefers-reduced-motion: reduce)': { animation: 'none' } }} mb="30px">
       <Flex align="center" gap={2}>
         <Box w="8px" h="8px" borderRadius="full" bg="brand.rec" />
         <Text fontFamily="mono" fontSize="11px" fontWeight={700} letterSpacing="0.2em" textTransform="uppercase" color="brand.bone">
@@ -54,12 +45,7 @@ function NowPlaying({ video }) {
             letterSpacing="-0.01em" lineHeight={0.95} color="brand.bone" fontSize="var(--title)">
         {video.title}
       </Text>
-      {video.text && (
-        <Text mt="var(--g1)" maxW="60ch" fontFamily="body" fontSize={{ base: '14px', md: '15px' }}
-              lineHeight={1.6} color="brand.gray" noOfLines={2}>
-          {video.text}
-        </Text>
-      )}
+      
 
       <Flex mt="var(--g2)" pt="var(--g2)" borderTop="1px solid" borderColor="brand.amberLight"
             wrap="wrap" align="flex-end" gap={{ base: '18px 28px', md: '18px 40px' }}>
@@ -198,7 +184,7 @@ export default function VideosSection() {
                     letterSpacing="0.24em" textTransform="uppercase" color="brand.bone">
                 Más videos
               </Text>
-              <Label>{videos.length} videos</Label>
+              
             </Flex>
 
             <Box as="ul" listStyleType="none" m={0} flex={{ lg: 1 }} minH={0}

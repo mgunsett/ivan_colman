@@ -74,24 +74,7 @@ export default function Footer() {
           {/* Crédito + volver arriba */}
           <Flex justifySelf={{ lg: 'end' }} align="center" gap={{ base: 4, md: 5 }}
                 direction={{ base: 'column', md: 'row' }}>
-            <Flex direction="column" align={{ base: 'center', md: 'flex-end' }} gap="5px">
-              <Text fontFamily="body" fontSize="11px" lineHeight={1} color="brand.gray">Desarrollo web</Text>
-              <Box
-                as="a"
-                href="https://matiasgunsett.netlify.app/sportfolio"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Sportfolio Web, desarrollo web"
-                display="block"
-                transition="opacity .2s ease"
-                _focusVisible={focus}
-                sx={{ [HOVER]: { '&:hover': { opacity: 0.75 } } }}
-              >
-                <Image src={sportfolioWeb} alt="Sportfolio Web" w="96px" h="auto" display="block" />
-              </Box>
-            </Flex>
-
-            <Flex
+                  <Flex
               as="a"
               href="#hero"
               onClick={toTop}
@@ -118,6 +101,23 @@ export default function Footer() {
               Volver arriba
               <Box as={FiArrowUp} boxSize="14px" aria-hidden="true" />
             </Flex>
+            <Flex direction="column" align={{ base: 'center', md: 'flex-end' }} gap="5px">
+              <Text fontFamily="body" fontSize="11px" lineHeight={1} color="brand.gray">Desarrollo web</Text>
+              <Box
+                as="a"
+                href="https://matiasgunsett.netlify.app/sportfolio"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Sportfolio Web, desarrollo web"
+                display="block"
+                transition="opacity .2s ease"
+                _focusVisible={focus}
+                sx={{ [HOVER]: { '&:hover': { opacity: 0.75 } } }}
+              >
+                <Image src={sportfolioWeb} alt="Sportfolio Web" w="90px" h="auto" display="block" />
+              </Box>
+            </Flex>
+
           </Flex>
         </Grid>
 
@@ -126,7 +126,7 @@ export default function Footer() {
           ref={signRef}
           aria-hidden="true"
           mt={{ base: 6, md: 7 }}
-          mb="-0.16em"
+          mb="-0.36em"
           justify="center"
           align="flex-end"
           whiteSpace="nowrap"
@@ -137,7 +137,7 @@ export default function Footer() {
           lineHeight={1}
           letterSpacing="-0.05em"
           textTransform="uppercase"
-          fontSize="120px"
+          fontSize="220px"
           color="transparent"
           sx={{ WebkitTextStrokeWidth: { base: '1px', md: '1.5px' } }}
         >

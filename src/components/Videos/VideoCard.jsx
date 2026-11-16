@@ -70,15 +70,7 @@ export function VideoCard({ video, index = 0 }) {
 
       {!playing && (
         <>
-          <Flex position="absolute" top={3} left={3} zIndex={3} align="center" gap="6px" px="9px" py="5px"
-                borderRadius="5px" bg="rgba(26,22,18,0.55)" border="1px solid" borderColor="rgba(212,165,116,0.7)"
-                sx={{ backdropFilter: 'blur(6px)' }}>
-            <Box w="6px" h="6px" borderRadius="full" bg="brand.rec" />
-            <Text fontFamily="mono" fontSize="9px" fontWeight={500} letterSpacing="0.24em"
-                  textTransform="uppercase" color="#FCF7F0" lineHeight={1}>
-              {video.category}
-            </Text>
-          </Flex>
+          
           <Flex position="absolute" top={3} right={3} zIndex={3} boxSize="28px" borderRadius="7px"
                 align="center" justify="center" bg="rgba(26,22,18,0.55)" border="1px solid"
                 borderColor="rgba(252,247,240,0.3)" color="#FCF7F0">
@@ -104,9 +96,7 @@ export function VideoCard({ video, index = 0 }) {
                 {video.league} {video.year}
               </Text>
             </Box>
-            <Text fontFamily="heading" fontWeight={700} fontSize="11px" letterSpacing="0.2em" color="brand.dorado">
-              {String(index + 1).padStart(2, '0')}
-            </Text>
+           
           </Flex>
         </>
       )}

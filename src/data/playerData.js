@@ -104,14 +104,14 @@ export const playerData = {
 
   // Estadísticas — 
   seasonStats: [
-    { label: 'Asistencias',     value: 21, featured: true,
+    { label: 'Asistencias',     value: 22, featured: true,
       caption: 'Asistencias en la temporada',
       text: 'El número que mejor lo define: hacer jugar al equipo.' },
-    { label: 'Partidos',        value: 63,       order: 1 },
-    { label: 'Minutos jugados', value: "3.641'", order: 3, wide: true },
-    { label: 'Valoración promedio', value: 8.9,  order: 4, tone: 'gold' },
-    { label: 'Goles',           value: 13,       order: 2 },
-    { label: 'Tiros al arco',   value: 14,       order: 5 },
+    { label: 'Partidos',        value: 77,       order: 1 },
+    { label: 'Minutos jugados', value: "4.541'", order: 3, wide: true },
+    { label: 'Valoración promedio', value: 7.89,  order: 4, tone: 'gold' },
+    { label: 'Goles',           value: 15,       order: 2 },
+    { label: 'Tiros al arco',   value: 39,       order: 5 },
   ],
   featuredImage: colman_stats,
 
@@ -332,9 +332,9 @@ export const playerData = {
     {
       label: 'Instagram',
       icon: FaInstagram,
-      handle: '@ivan_colman8',
+      handle: '@ivan_colman10',
       note: 'Su cuenta personal',
-      url: 'https://www.instagram.com/ivan_colman8/',
+      url: 'https://www.instagram.com/ivan_colman10/',
       hoverColor: '#E1306C',
     },
     {

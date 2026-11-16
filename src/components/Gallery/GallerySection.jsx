@@ -12,12 +12,6 @@ import useScrubReveal from '../../hooks/useScrubReveal'
 
 gsap.registerPlugin(ScrollTrigger)
 
-// ─── Galería: diseño "Carriles" ─────────────────────────────────────
-// Una fila horizontal por galería (playerData.galleries), todas a la vista.
-// Cada foto mantiene su forma (shape: tall | square | wide). Las flechas
-// mueven el carril con scrollTo, nunca con scrollIntoView (que desplaza
-// la página). Al tocar una foto se abre el visor de esa galería.
-
 const EASE = 'cubic-bezier(0.23,1,0.32,1)'
 const HOVER = '@media (hover: hover) and (pointer: fine)'
 const plural = (n) => `${n} ${n === 1 ? 'foto' : 'fotos'}`
@@ -90,7 +84,7 @@ function Lightbox({ gallery, index, onClose, onGo }) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="full" motionPreset="none">
       <ModalOverlay bg="rgba(26,22,18,0.95)" sx={{ backdropFilter: 'blur(10px)' }} />
-      <ModalContent bg="transparent" boxShadow="none" m={0} aria-label="Foto ampliada">
+      <ModalContent bg="transparent" boxShadow="none" m={0} h="100svh" overflow="hidden" aria-label="Foto ampliada">
         {photo && (
           <Box display="grid" gridTemplateRows="auto 1fr auto" gap={3.5} h="100svh"
                px={{ base: 4, md: 6 }} pt={{ base: 4, md: 5 }} pb={{ base: '76px', md: 6 }} color="#FCF7F0">
@@ -107,8 +101,14 @@ function Lightbox({ gallery, index, onClose, onGo }) {
             <Box
               position="relative"
               display="grid"
+              gridTemplateRows="minmax(0, 1fr)"
+              gridTemplateColumns="minmax(0, 1fr)"
               placeItems="center"
               minH={0}
+              w="100%"
+              maxW="1400px"
+              mx="auto"
+              px={{ base: 0, md: 16 }}
               sx={{ touchAction: 'pan-y' }}
               onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
               onPointerDown={(e) => { x0.current = e.clientX }}
@@ -121,6 +121,8 @@ function Lightbox({ gallery, index, onClose, onGo }) {
                 key={photo.src}
                 src={photo.src}
                 alt={photo.alt}
+                w="auto"
+                h="auto"
                 maxW="100%"
                 maxH="100%"
                 objectFit="contain"
@@ -199,10 +201,7 @@ function Lane({ gallery, first, onOpen }) {
           >
             {gallery.name}
           </Text>
-          <Text fontFamily="heading" fontWeight={700} fontSize={{ base: '10px', md: '12px' }} letterSpacing="0.12em"
-                color="brand.orange" mb={{ base: 1.5, md: 2.5 }} whiteSpace="nowrap">
-            {plural(gallery.photos.length)}
-          </Text>
+          
         </Flex>
 
         <Flex align="center" gap={6} flexShrink={0}>
@@ -272,11 +271,7 @@ function Lane({ gallery, first, onOpen }) {
                 draggable={false}
                 transition={`transform .7s ${EASE}`}
               />
-              <Text as="span" position="absolute" left="10px" bottom="10px" px={2} py="5px" borderRadius="4px"
-                    bg="rgba(26,22,18,0.55)" color="#FCF7F0" fontFamily="heading" fontWeight={700}
-                    fontSize="10px" letterSpacing="0.12em" lineHeight={1}>
-                {String(j + 1).padStart(2, '0')}
-              </Text>
+              
             </Box>
           </Box>
         ))}

@@ -1,11 +1,6 @@
 import { Box, Flex, Grid, Image, SimpleGrid, Text, useToken } from '@chakra-ui/react'
 import { playerData } from '../../data/playerData.js'
 
-// ─── Diseño "Marcador" ──────────────────────────────────────────────
-// Arriba: el número que mejor define al jugador en grande (con recorte)
-// y el resto de la temporada en recuadros. Abajo: perfil y atributos.
-// Las animaciones las coordina StatsSection (clase .st-reveal).
-
 const HOVER = '@media (hover: hover) and (pointer: fine)'
 
 const tileBase = {
@@ -85,7 +80,7 @@ function FeaturedTile({ stat }) {
           alt={`${playerData.shortName ?? playerData.displayName} de espaldas, con la ${playerData.number} de ${playerData.currentClub}`}
           loading="lazy"
           position="absolute"
-          right={{ base: '-12%', md: '4%', lg: '-10%' }}
+          right={{ base: '-5%', md: '0%', lg: '0%' }}
           bottom={0}
           h={{ base: '84%', md: '94%', lg: '86%' }}
           w="auto"

@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react'
 import { Box, Flex, Image, SimpleGrid, Text } from '@chakra-ui/react'
-import { FaInstagram } from 'react-icons/fa'
 import { FiArrowUpRight } from 'react-icons/fi'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -9,11 +8,6 @@ import { playerData } from '../../data/playerData'
 import useScrubReveal from '../../hooks/useScrubReveal'
 
 gsap.registerPlugin(ScrollTrigger)
-
-// ─── Contacto: diseño "Tarjetas" ────────────────────────────────────
-// Arriba, una tarjeta por red (playerData.socialMedia): al pasar el mouse
-// toma el color de la red. Debajo, una tarjeta por representante
-// (playerData.contact) con "Escribile por…" y un botón.
 
 const EASE = 'cubic-bezier(0.23,1,0.32,1)'
 const HOVER = '@media (hover: hover) and (pointer: fine)'
@@ -90,24 +84,53 @@ function SocialCard({ item }) {
   )
 }
 
+// Toda la tarjeta es el link. Al pasar el mouse se enciende un halo dorado
+// desde el logo, se marca el borde y la flecha se desplaza.
 function RepCard({ item }) {
   return (
     <Box
-      as="article"
+      as="a"
+      href={item.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={`${item.label} (${item.title}): ${item.handle}`}
       className="ct-reveal"
-      display="grid"
-      gridTemplateColumns="auto minmax(0,1fr)"
-      gap="18px 20px"
+      position="relative"
+      overflow="hidden"
+      display="flex"
       alignItems="center"
+      gap={5}
       p={{ base: 5, md: 6 }}
+      pr={{ base: 16, md: 20 }}
       border="1px solid"
       borderColor="brand.amberLight"
       borderRadius="14px"
       bg="brand.dark"
+      transition={`border-color .25s ease, background-color .25s ease, transform .16s ${EASE}`}
+      _active={{ transform: 'scale(0.985)' }}
+      _focusVisible={focus}
+      _before={{
+        content: '""',
+        position: 'absolute',
+        inset: 0,
+        bg: 'radial-gradient(120% 140% at 0% 50%, var(--chakra-colors-brand-dorado) 0%, transparent 60%)',
+        opacity: 0,
+        transition: 'opacity .35s ease',
+        pointerEvents: 'none',
+      }}
+      sx={{
+        [HOVER]: {
+          '&:hover': { borderColor: 'brand.dorado', bg: 'brand.dark3' },
+          '&:hover::before': { opacity: 0.22 },
+          '&:hover .ct-logo': { transform: 'scale(1.05)' },
+          '&:hover .ct-go': { transform: 'translate(2px,-2px)', bg: 'brand.amber', color: 'brand.dark', borderColor: 'brand.amber' },
+        },
+      }}
     >
-      <Image src={item.image} alt={`Logo de ${item.label}`} boxSize={{ base: '60px', md: '72px' }} borderRadius="full"
-             objectFit="contain" bg="white" border="1px solid" borderColor="brand.amberLight" p="6px" />
-      <Box minW={0}>
+      <Image className="ct-logo" src={item.image} alt="" position="relative" flexShrink={0}
+             boxSize={{ base: '60px', md: '72px' }} borderRadius="full" objectFit="contain"
+             bg="brand.amber" p={2} transition={`transform .35s ${EASE}`} />
+      <Box position="relative" minW={0}>
         <Text fontFamily="body" fontWeight={500} fontSize="12px" lineHeight={1} color="brand.orange">{item.title}</Text>
         <Text mt="7px" fontFamily="heading" fontWeight={700} fontSize="22px" lineHeight={1.05} textTransform="uppercase" color="brand.bone">
           {item.label}
@@ -115,38 +138,11 @@ function RepCard({ item }) {
         <Text mt="6px" fontFamily="body" fontSize="13px" lineHeight={1} color="brand.gray">{item.handle}</Text>
       </Box>
 
-      {item.forWhom && (
-        <Text gridColumn="1 / -1" pt={4} borderTop="1px solid" borderColor="brand.amberLight"
-              fontFamily="body" fontSize="14px" lineHeight={1.5} color="brand.bone">
-          <Text as="b" fontWeight={700}>Escribile por</Text> {item.forWhom}
-        </Text>
-      )}
-
-      <Flex
-        as="a"
-        href={item.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        gridColumn="1 / -1"
-        justifySelf="start"
-        align="center"
-        gap={2.5}
-        px="18px"
-        py={3}
-        borderRadius="full"
-        bg="brand.amber"
-        color="brand.dark"
-        fontFamily="heading"
-        fontWeight={700}
-        fontSize="13px"
-        lineHeight={1}
-        transition={`background .2s ease, transform .16s ${EASE}`}
-        _active={{ transform: 'scale(0.97)' }}
-        _focusVisible={focus}
-        sx={{ [HOVER]: { '&:hover': { bg: '#3A3129' } } }}
-      >
-        <Box as={FaInstagram} boxSize="16px" aria-hidden="true" />
-        {item.cta ?? `Escribir a ${item.label}`}
+      <Flex className="ct-go" position="absolute" top="50%" right={{ base: 5, md: 6 }} mt="-17px" boxSize="34px"
+            borderRadius="full" border="1px solid" borderColor="brand.amberLight" color="brand.bone"
+            align="center" justify="center" aria-hidden="true"
+            transition={`transform .25s ${EASE}, background-color .2s ease, color .2s ease, border-color .2s ease`}>
+        <Box as={FiArrowUpRight} boxSize="15px" />
       </Flex>
     </Box>
   )
