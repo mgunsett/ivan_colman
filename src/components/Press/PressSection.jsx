@@ -192,19 +192,25 @@ export default function PressSection() {
       ref={sectionRef}
       aria-labelledby="prensa-title"
       bg="brand.dark"
-      pt={{ base: 16, lg: 20 }}
-      pb={{ base: 16, lg: 24 }}
+      // La sección ocupa exactamente un viewport: el padding superior deja
+      // lugar al navbar fijo y la pantalla se estira para llenar el resto.
+      display="flex"
+      flexDirection="column"
+      h="100svh"
+      minH={{ base: '600px', md: '640px' }}
+      pt={{ base: '76px', lg: '84px' }}
+      pb={{ base: 6, lg: 8 }}
       px={{ base: 4, md: 8, lg: 10 }}
       sx={{ overflow: 'clip' }}
     >
-      <Box maxW="1400px" mx="auto">
-        <Flex ref={headerRef} justify="space-between" align="flex-end" gap={6} wrap="wrap">
+      <Flex direction="column" flex="1" minH={0} w="100%" maxW="1400px" mx="auto">
+        <Flex ref={headerRef} flexShrink={0} justify="space-between" align="flex-end" gap={{ base: 2, md: 6 }} wrap="wrap">
           <Box>
             <Text fontFamily="mono" fontSize="10px" color="brand.bone" textTransform="uppercase" letterSpacing="0.28em">
               Medios
             </Text>
             <Text as="h2" id="prensa-title" fontFamily="heading" fontWeight="bold"
-                  fontSize={{ base: '4xl', lg: '5xl' }} color="brand.amber" lineHeight={1} mt={2}>
+                  fontSize={{ base: '4xl', lg: '5xl' }} color="brand.amber" lineHeight={1} mt={{ base: 1, lg: 2 }}>
               Prensa
             </Text>
           </Box>
@@ -221,13 +227,14 @@ export default function PressSection() {
           aria-labelledby={`prensa-canal-${active}`}
           aria-live="polite"
           position="relative"
-          mt={10}
+          mt={{ base: 4, lg: 6 }}
           w="100%"
-          maxH={{ lg: '78vh' }}
+          flex="1 1 auto"
+          minH={{ base: '260px', md: '300px' }}
           borderRadius="14px"
           overflow="hidden"
           bg="brand.amber"
-          sx={{ isolation: 'isolate', aspectRatio: { base: '4 / 5', md: '4 / 3', lg: '16 / 9' } }}
+          sx={{ isolation: 'isolate' }}
         >
           <Image
             src={note.image}
@@ -265,7 +272,8 @@ export default function PressSection() {
           role="tablist"
           aria-label="Medios"
           onKeyDown={onKeyDown}
-          mt={3.5}
+          flexShrink={0}
+          mt={3}
           display="grid"
           gridTemplateColumns={{ md: `repeat(${press.length}, 1fr)` }}
           gridAutoFlow={{ base: 'column', md: 'row' }}
@@ -294,7 +302,7 @@ export default function PressSection() {
                 alignItems="center"
                 gap={3.5}
                 px="18px"
-                py={4}
+                py={3}
                 textAlign="left"
                 borderRadius="12px"
                 border="1px solid"
@@ -311,7 +319,7 @@ export default function PressSection() {
                 } : undefined}
                 sx={{ [HOVER]: on ? {} : { '&:hover': { borderColor: 'brand.amber' } } }}
               >
-                <Image src={n.logo} alt="" boxSize="40px" objectFit="contain" borderRadius="8px" bg="white"
+                <Image src={n.logo} alt="" boxSize="36px" objectFit="contain" borderRadius="8px" bg="white"
                        border="1px solid" borderColor="brand.amberLight" p="3px" flexShrink={0} />
                 <Box minW={0}>
                   <Text fontFamily="heading" fontWeight={700} fontSize="14px" lineHeight={1.1} noOfLines={1}>{n.media}</Text>
@@ -323,7 +331,7 @@ export default function PressSection() {
             )
           })}
         </Box>
-      </Box>
+      </Flex>
     </Box>
   )
 }
