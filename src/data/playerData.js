@@ -6,6 +6,7 @@ import { IoMdStats } from 'react-icons/io'
 import polaco1 from '@assets/polaco1.webp'
 //Estadísticas (recuadro destacado)
 import polaco2 from '@assets/polaco2.webp'
+import colman_stats from '@assets/colman_stats.webp'
 
 import argentina from '@assets/argentina.webp'
 import cusco from '@assets/escudo_cusco.webp'
@@ -91,7 +92,7 @@ export const playerData = {
     { label: 'Goles',           value: 13,       order: 2 },
     { label: 'Tiros al arco',   value: 14,       order: 5 },
   ],
-  featuredImage: polaco2,
+  featuredImage: colman_stats,
 
   clubs: [
     {
