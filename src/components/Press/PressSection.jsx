@@ -8,13 +8,6 @@ import useScrubReveal from '../../hooks/useScrubReveal'
 
 gsap.registerPlugin(ScrollTrigger)
 
-// ─── Prensa: diseño "Zócalo" ────────────────────────────────────────
-// Cada nota se ve como el gráfico de una transmisión: una pantalla con
-// la foto en blanco y negro y, encima, un zócalo translúcido con el logo
-// del medio, el titular y el dato de la nota. Debajo, un "canal" por
-// medio para cambiarla. Al cambiar con el mouse o el dedo, el zócalo
-// entra con un barrido; con el teclado el cambio es inmediato.
-
 const EASE = 'cubic-bezier(0.23,1,0.32,1)'
 const HOVER = '@media (hover: hover) and (pointer: fine)'
 const REDUCED = '@media (prefers-reduced-motion: reduce)'
@@ -214,9 +207,7 @@ export default function PressSection() {
               Prensa
             </Text>
           </Box>
-          <Text maxW="44ch" fontFamily="body" fontSize={{ base: '13px', md: '14px' }} lineHeight={1.6} color="brand.gray">
-            Lo que se dijo de él en la Liga 1. Elegí un medio para ver su nota.
-          </Text>
+          
         </Flex>
 
         {/* Pantalla */}
@@ -253,15 +244,7 @@ export default function PressSection() {
               [REDUCED]: { filter: 'grayscale(1) brightness(.82)', transition: 'opacity .2s ease' },
             }}
           />
-          <Box position="absolute" inset={0} zIndex={1} pointerEvents="none"
-               bg="linear-gradient(180deg, transparent 60%, rgba(26,22,18,0.32) 100%)" />
-
-          <Flex position="absolute" top={{ base: 4, lg: '22px' }} left={{ base: 4, lg: 6 }} zIndex={2} align="center" gap={2}
-                px="11px" py="7px" borderRadius="6px" bg="rgba(26,22,18,0.6)" color="#FCF7F0">
-            <Box w="8px" h="8px" borderRadius="full" bg="brand.rec" />
-            <Text fontFamily="body" fontWeight={500} fontSize="12px" lineHeight={1}>{note.type}</Text>
-          </Flex>
-
+          <Box position="absolute" inset={0} zIndex={1} pointerEvents="none" bg="linear-gradient(180deg, transparent 60%, rgba(26,22,18,0.32) 100%)" />
           <Zocalo note={note} wiping={wiping} />
         </Box>
 

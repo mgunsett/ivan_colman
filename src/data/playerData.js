@@ -220,7 +220,7 @@ export const playerData = {
     {
       key: 'cusco',
       name: 'Cusco F.C.',
-      description: 'Liga 1 con Cusco F.C., desde 2024.',
+      description: 'Liga 1 desde 2024.',
       logo: cusco,
       photos: [
       { src: image37, alt: `${N} festeja un gol con Cusco F.C.`, pos: 'center 28%', shape: 'tall' },
@@ -256,7 +256,7 @@ export const playerData = {
     {
       key: 'libertadores',
       name: 'Copa Libertadores',
-      description: 'Cusco F.C. ante Flamengo, por la Copa Libertadores.',
+      description: '2025',
       logo: cusco,
       photos: [
       { src: image34, alt: `${N} encara entre dos jugadores de Flamengo`, pos: 'center 45%', shape: 'wide' },
@@ -268,7 +268,7 @@ export const playerData = {
     {
       key: 'quilmes',
       name: 'Quilmes',
-      description: 'Su etapa en Quilmes, entre 2022 y 2023.',
+      description: '2023',
       logo: escudoQuilmes,
       photos: [
       { src: image23, alt: `${N} patea un tiro de esquina con Quilmes`, pos: 'center 30%', shape: 'tall' },
@@ -296,7 +296,7 @@ export const playerData = {
       quote: 'Iván Colman lidera el torneo con 328 pases completados y una precisión del 85,19%.',
       stat:  { value: '328', label: 'pases completados' },
       image: image33,
-      pos:   'center 40%',
+      pos:   'center 50%',
     },
     {
       media: 'OneFootball',
@@ -307,8 +307,8 @@ export const playerData = {
       title: 'El más asistidor de los últimos 5 años de la Liga 1',
       quote: 'Todo equipo necesita al jugador de los buenos pases, y Cusco tiene a Iván Colman. Con 31 asistencias, se convirtió en el jugador más asistidor de los últimos 5 años de la Liga 1.',
       stat:  { value: '31', label: 'asistencias' },
-      image: image28,
-      pos:   'center 8%',
+      image: image34,
+      pos:   'center 28%',
       featured: true,
     },
     {
@@ -321,7 +321,7 @@ export const playerData = {
       quote: 'Iván Colman es el Jugador al Volante de la Fecha 1 tras su gol y asistencia en la victoria de Cusco FC.',
       stat:  { value: 'F1', label: 'jugador de la fecha' },
       image: image37,
-      pos:   'center 18%',
+      pos:   'center 25%',
     },
   ],
 

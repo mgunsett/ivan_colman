@@ -342,9 +342,7 @@ export default function GallerySection() {
               Galería
             </Text>
           </Box>
-          <Text maxW="44ch" fontFamily="body" fontSize={{ base: '13px', md: '14px' }} lineHeight={1.6} color="brand.gray">
-            Sus galerías a la vista, una debajo de la otra. Deslizá cada carril o usá sus flechas.
-          </Text>
+          
         </Flex>
 
         {galleries.map((g, i) => (

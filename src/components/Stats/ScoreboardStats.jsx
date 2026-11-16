@@ -146,9 +146,9 @@ function ProfileCard() {
     <Box className="st-reveal" border="1px solid" borderColor="brand.amberLight"
          borderRadius="16px" p={{ base: '22px 20px', md: '28px' }} position="relative" overflow="hidden">
       {/* Dorsal en contorno: llena el espacio libre cuando la tarjeta crece a la par del radar */}
-      <Text aria-hidden="true" display={{ base: 'none', lg: 'block' }} position="absolute" right="24px" bottom="-18px"
-            fontFamily="heading" fontWeight={700} fontSize="150px" lineHeight={1} letterSpacing="-0.04em"
-            color="transparent" pointerEvents="none" userSelect="none"
+      <Text aria-hidden="true" display={{ base: 'none', lg: 'block' }} position="absolute" right="-24px" bottom="-58px"
+            fontFamily="heading" fontWeight={700} fontSize="250px" lineHeight={1} letterSpacing="-0.04em"
+            color="transparent" pointerEvents="none" opacity="0.5" userSelect="none"
             sx={{ WebkitTextStroke: '1.5px', WebkitTextStrokeColor: 'var(--chakra-colors-brand-dorado)' }}>
         {playerData.number}
       </Text>
@@ -215,7 +215,7 @@ function Radar({ stats }) {
         const [x, y] = pt(i, R + 20)
         const anchor = Math.abs(x - CX) < 5 ? 'middle' : x > CX ? 'start' : 'end'
         return (
-          <text key={s.label} x={x} y={y + 4} textAnchor={anchor} fontFamily="Nippo" fontSize="10"
+          <text key={s.label} x={x} y={y + 4} textAnchor={anchor} fontFamily="Nippo" fontSize="9"
                 fontWeight="500" letterSpacing="1" fill={muted}>
             {s.label.toUpperCase()}
           </text>
