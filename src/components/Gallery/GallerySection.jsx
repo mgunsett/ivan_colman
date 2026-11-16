@@ -1,450 +1,363 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
-import { Box, Text, Flex, Image } from '@chakra-ui/react'
-import { FiX } from 'react-icons/fi'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import {
+  Box, Flex, HStack, IconButton, Image, Modal, ModalContent, ModalOverlay, Text,
+} from '@chakra-ui/react'
+import { keyframes } from '@emotion/react'
+import { FiChevronLeft, FiChevronRight, FiX } from 'react-icons/fi'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+
 import { playerData } from '../../data/playerData'
+import useScrubReveal from '../../hooks/useScrubReveal'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const MotionBox = motion(Box)
-const MotionImage = motion(Image)
+// ─── Galería: diseño "Carriles" ─────────────────────────────────────
+// Una fila horizontal por galería (playerData.galleries), todas a la vista.
+// Cada foto mantiene su forma (shape: tall | square | wide). Las flechas
+// mueven el carril con scrollTo, nunca con scrollIntoView (que desplaza
+// la página). Al tocar una foto se abre el visor de esa galería.
 
-const SPRING = { type: 'spring', stiffness: 240, damping: 28, mass: 0.9 }
+const EASE = 'cubic-bezier(0.23,1,0.32,1)'
+const HOVER = '@media (hover: hover) and (pointer: fine)'
+const plural = (n) => `${n} ${n === 1 ? 'foto' : 'fotos'}`
 
-function Lightbox({ photo, onClose, onPrev, onNext }) {
+// Alto del carril y ancho de cada forma (proporción de la celda)
+const RAIL_H = { base: 240, md: 280, lg: 340 }
+const RATIO = { tall: 0.8, square: 1, wide: 1.5 }
+const widthFor = (shape = 'square') => ({
+  base: `${Math.round(RAIL_H.base * RATIO[shape])}px`,
+  md: `${Math.round(RAIL_H.md * RATIO[shape])}px`,
+  lg: `${Math.round(RAIL_H.lg * RATIO[shape])}px`,
+})
+
+const lbIn = keyframes`from { opacity: 0; transform: scale(0.985); } to { opacity: 1; transform: none; }`
+
+const arrowStyle = {
+  variant: 'unstyled',
+  minW: { base: '34px', md: '38px' },
+  h: { base: '34px', md: '38px' },
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  borderRadius: '6px',
+  border: '1px solid',
+  borderColor: 'brand.amber',
+  color: 'brand.bone',
+  transition: 'background .25s, opacity .25s',
+  _disabled: { opacity: 0.3, cursor: 'default' },
+  _focusVisible: { outline: '2px solid', outlineColor: 'brand.orange', outlineOffset: '3px' },
+  sx: { [HOVER]: { '&:not(:disabled):hover': { bg: 'rgba(212,165,116,0.18)' } } },
+}
+
+// ─── Visor ──────────────────────────────────────────────────────────
+function Lightbox({ gallery, index, onClose, onGo }) {
+  const isOpen = gallery != null
+  const photos = gallery?.photos ?? []
+  const photo = photos[index]
+  const x0 = useRef(null)
+
+  const go = useCallback((d) => {
+    const n = index + d
+    if (n >= 0 && n < photos.length) onGo(n)
+  }, [index, photos.length, onGo])
+
   useEffect(() => {
-    const handler = (e) => {
-      if (e.key === 'Escape')     onClose()
-      if (e.key === 'ArrowRight') onNext()
-      if (e.key === 'ArrowLeft')  onPrev()
+    if (!isOpen) return
+    const onKey = (e) => {
+      if (e.key === 'ArrowRight') go(1)
+      if (e.key === 'ArrowLeft') go(-1)
     }
-    window.addEventListener('keydown', handler)
-    return () => window.removeEventListener('keydown', handler)
-  }, [onClose, onPrev, onNext])
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [isOpen, go])
 
-  const touchStart = useRef(0)
+  const btn = {
+    variant: 'unstyled',
+    minW: '46px',
+    h: '46px',
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 'full',
+    border: '1px solid rgba(252,247,240,0.3)',
+    bg: 'rgba(26,22,18,0.5)',
+    color: '#FCF7F0',
+    _disabled: { opacity: 0.25, cursor: 'default' },
+    _focusVisible: { outline: '2px solid', outlineColor: 'brand.dorado', outlineOffset: '3px' },
+  }
 
   return (
-    <MotionBox
-      position="fixed" inset={0} zIndex={900}
-      bg="rgba(0,0,0,0.93)"
-      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      transition={{ duration: 0.25 }}
-      display="flex" alignItems="center" justifyContent="center"
-      onClick={onClose}
-      onTouchStart={(e) => { touchStart.current = e.touches[0].clientX }}
-      onTouchEnd={(e) => {
-        const dx = e.changedTouches[0].clientX - touchStart.current
-        if (dx > 50) onPrev()
-        if (dx < -50) onNext()
-      }}
-    >
-      <MotionImage
-        src={photo.src} alt={photo.alt}
-        maxH="78vh" maxW="90vw"
-        objectFit="contain"
-        borderRadius="5px"
-        initial={{ scale: 0.96, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.3 }}
-        onClick={(e) => e.stopPropagation()}
-        draggable={false}
-      />
-      
-      {/* Navigation wings */}
-      <Box position="absolute" left={50} top={0} bottom={0} w="15%"
-           display={{ base: 'none', lg: 'flex' }} alignItems="center" justifyContent="center"
-           onClick={(e) => { e.stopPropagation(); onPrev() }}
-           cursor="pointer" opacity={0.4} _hover={{ opacity: 1 }} transition="opacity 0.2s">
-        <Text fontFamily="heading" fontSize="3xl" color="white">‹</Text>
-      </Box>
-      <Box position="absolute" right={50} top={0} bottom={0} w="15%"
-           display={{ base: 'none', lg: 'flex' }} alignItems="center" justifyContent="center"
-           onClick={(e) => { e.stopPropagation(); onNext() }}
-           cursor="pointer" opacity={0.4} _hover={{ opacity: 1 }} transition="opacity 0.2s">
-        <Text fontFamily="heading" fontSize="3xl" color="white">›</Text>
-      </Box>
-      {/* Close */}
-      <Box
-        as="button"
-        position="absolute"
-        top={{ base: 36, md: 14 }}
-        right={{ base: 4, md: 60 }}
-        zIndex={2100}
-        aria-label="Cerrar video"
-        borderRadius="full"
-        p={1}
-        bg="brand.bgRef"
-        backdropFilter="blur(10px)"
-        color="white"
-        onClick={onClose}
-        transition="color 0.3s ease, transform 0.3s ease"
-        _hover={{ color: 'brand.gray2', transform: 'rotate(90deg)' }}
-      >
-        <Box as={FiX} fontSize="32px" />
-      </Box>
-    </MotionBox>
+    <Modal isOpen={isOpen} onClose={onClose} size="full" motionPreset="none">
+      <ModalOverlay bg="rgba(26,22,18,0.95)" sx={{ backdropFilter: 'blur(10px)' }} />
+      <ModalContent bg="transparent" boxShadow="none" m={0} aria-label="Foto ampliada">
+        {photo && (
+          <Box display="grid" gridTemplateRows="auto 1fr auto" gap={3.5} h="100svh"
+               px={{ base: 4, md: 6 }} pt={{ base: 4, md: 5 }} pb={{ base: '76px', md: 6 }} color="#FCF7F0">
+            <Flex justify="space-between" align="center">
+              <Text fontFamily="heading" fontWeight={700} fontSize="14px" letterSpacing="0.08em" textTransform="uppercase">
+                {gallery.name}
+                <Text as="span" ml={2.5} fontWeight={500} fontSize="11px" letterSpacing="0.12em" color="brand.gray2">
+                  {plural(photos.length)}
+                </Text>
+              </Text>
+              <IconButton aria-label="Cerrar" icon={<FiX size={20} />} onClick={onClose} {...btn} />
+            </Flex>
+
+            <Box
+              position="relative"
+              display="grid"
+              placeItems="center"
+              minH={0}
+              sx={{ touchAction: 'pan-y' }}
+              onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
+              onPointerDown={(e) => { x0.current = e.clientX }}
+              onPointerUp={(e) => {
+                if (x0.current !== null && Math.abs(e.clientX - x0.current) > 40) go(e.clientX < x0.current ? 1 : -1)
+                x0.current = null
+              }}
+            >
+              <Image
+                key={photo.src}
+                src={photo.src}
+                alt={photo.alt}
+                maxW="100%"
+                maxH="100%"
+                objectFit="contain"
+                borderRadius="8px"
+                draggable={false}
+                sx={{
+                  animation: `${lbIn} .25s ${EASE}`,
+                  '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
+                }}
+              />
+              <IconButton aria-label="Foto anterior" icon={<FiChevronLeft size={20} />} onClick={() => go(-1)}
+                          isDisabled={index === 0} position="absolute"
+                          left={{ base: '30%', md: 0 }} top={{ md: '50%' }} bottom={{ base: '-62px', md: 'auto' }}
+                          transform={{ md: 'translateY(-50%)' }} {...btn} />
+              <IconButton aria-label="Foto siguiente" icon={<FiChevronRight size={20} />} onClick={() => go(1)}
+                          isDisabled={index === photos.length - 1} position="absolute"
+                          right={{ base: '30%', md: 0 }} top={{ md: '50%' }} bottom={{ base: '-62px', md: 'auto' }}
+                          transform={{ md: 'translateY(-50%)' }} {...btn} />
+            </Box>
+
+            <Text textAlign="center" fontFamily="heading" fontWeight={500} fontSize="12px" letterSpacing="0.12em"
+                  color="brand.gray2" aria-live="polite">
+              {index + 1} de {photos.length}
+            </Text>
+          </Box>
+        )}
+      </ModalContent>
+    </Modal>
   )
 }
 
-function GalleryCard({ photo, offset, abs, cardW, spacing, total, index, onFocus, onZoom }) {
-  const isCenter = offset === 0
-  const dir = offset === 0 ? 0 : offset > 0 ? 1 : -1
+// ─── Carril ─────────────────────────────────────────────────────────
+function Lane({ gallery, first, onOpen }) {
+  const railRef = useRef(null)
+  const [edges, setEdges] = useState({ start: true, end: false })
+  const titleId = `galeria-${gallery.key}`
+
+  const sync = useCallback(() => {
+    const el = railRef.current
+    if (!el) return
+    setEdges({ start: el.scrollLeft < 4, end: el.scrollLeft + el.clientWidth >= el.scrollWidth - 4 })
+  }, [])
+
+  useEffect(() => {
+    const el = railRef.current
+    if (!el) return
+    const ro = new ResizeObserver(sync)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [sync])
+
+  const move = (d) => {
+    const el = railRef.current
+    if (el) el.scrollTo({ left: el.scrollLeft + d * el.clientWidth * 0.8, behavior: 'smooth' })
+  }
 
   return (
-    <MotionBox
-      position="absolute"
-      top="50%"
-      left={{ base: '48%', md: '50%' }}
-      h={{ base: '78%', md: '86%' }}
-      style={{ width: cardW, transformStyle: 'preserve-3d' }}
-      initial={false}
-      animate={{
-        x: `calc(-50% + ${offset * spacing}px)`,
-        y: '-50%',
-        rotateY: -dir * 32,
-        scale: 1 - abs * 0.13,
-        z: -abs * 160,
-        opacity: abs > 2 ? 0 : 1,
-      }}
-      transition={SPRING}
-      zIndex={20 - abs * 4}
-      cursor={isCenter ? 'zoom-in' : 'pointer'}
-      onClick={() => (isCenter ? onZoom() : onFocus())}
-      pointerEvents={abs > 2 ? 'none' : 'auto'}
-    >
-      <Box
-        position="relative"
-        w={{ base: '200px', md: '100%' }} 
-        h="100%"
-        overflow="hidden"
-        borderRadius='5px'
-        border="1px solid"
-        borderColor={isCenter ? 'brand.amber' : 'brand.amber2'}
-        boxShadow={isCenter
-          ? ' -1px 12px 19px 0px rgba(0,0,0,0.75)'
-          : '0 24px 60px rgba(0,0,0,0.45)'}
-        transition="border-color 0.4s"
-      >
-        <Image
-          src={photo.src} alt={photo.alt}
-          w="100%" h="100%"
-          objectFit="cover"
-          objectPosition="center"
-          draggable={false}
-          loading="lazy"
-        />
-
-        {/* Velo oscuro en tarjetas laterales */}
-        <Box
-          position="absolute" inset={0}
-          bg="rgba(5,11,20,0.55)"
-          opacity={isCenter ? 0 : 1}
-          transition="opacity 0.45s ease"
-          pointerEvents="none"
-        />
-
-        {/* Degradado inferior */}
-        <Box
-          position="absolute" inset={0}
-          background="linear-gradient(to top, rgba(3,6,10,0.92) 0%, transparent 42%, rgba(3,6,10,0.2) 100%)"
-          pointerEvents="none"
-        />
-
-        {/* Badge índice */}
-        <Flex
-          position="absolute" top={4} right={4}
-          align="center"
-          px={2.5} py={1}
-          borderRadius="full"
-          bg="rgba(5,11,20,0.55)"
-          backdropFilter="blur(6px)"
-          border="1px solid"
-          borderColor="whiteAlpha.200"
-          opacity={isCenter ? 1 : 0}
-          transition="opacity 0.4s ease"
-        >
-          <Text fontFamily="mono" fontSize="10px" color="white" letterSpacing="0.15em">
-            {String(index + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}
+    <Box as="article" className="gal-reveal" aria-labelledby={titleId} mt={{ base: 12, md: 14 }}>
+      <Flex align="flex-end" justify="space-between" gap={5} pb={4}
+            borderBottom="1px solid" borderColor="brand.amberLight">
+        <Flex align="flex-end" gap={{ base: 2.5, md: 3.5 }} minW={0} wrap={{ base: 'wrap', md: 'nowrap' }} rowGap={1}>
+          <Image src={gallery.logo} alt="" boxSize={{ base: '24px', md: '34px' }} objectFit="contain"
+                 mb={{ base: 1, md: 1.5 }} flexShrink={0} />
+          <Text
+            as="h3"
+            id={titleId}
+            fontFamily="heading"
+            fontWeight={700}
+            fontSize={{ base: '26px', md: '44px', lg: '60px' }}
+            lineHeight={0.9}
+            letterSpacing="-0.01em"
+            textTransform="uppercase"
+            whiteSpace={{ base: 'normal', md: 'nowrap' }}
+            color={first ? 'brand.amber' : 'transparent'}
+            sx={{ WebkitTextStrokeWidth: { base: '1.2px', md: '1.5px' }, WebkitTextStrokeColor: 'var(--chakra-colors-brand-amber)' }}
+          >
+            {gallery.name}
+          </Text>
+          <Text fontFamily="heading" fontWeight={700} fontSize={{ base: '10px', md: '12px' }} letterSpacing="0.12em"
+                color="brand.orange" mb={{ base: 1.5, md: 2.5 }} whiteSpace="nowrap">
+            {plural(gallery.photos.length)}
           </Text>
         </Flex>
 
-        {/* Info de la foto central */}
-        <Box
-          position="absolute" bottom={0} left={0} right={0}
-          p={{ base: 4, md: 6 }}
-          opacity={isCenter ? 1 : 0}
-          transform={isCenter ? 'translateY(0)' : 'translateY(12px)'}
-          transition="opacity 0.45s ease 0.05s, transform 0.45s ease 0.05s"
-        >
-         {/* Logo */}
-        <Text
-          fontFamily="heading"
-          fontWeight="bold"
-          fontSize="2xl"
-          letterSpacing="wider"
-          cursor="pointer"
-          onClick={(e) => handleLink(e, '#hero')}
-          color="brand.amber"
-          _hover={{ color: 'brand.amber' }}
-          transition="color 0.2s"
-        >
-          {playerData.initials}
-          <Box as="span" color="brand.dorado">_</Box>
-        </Text>
-        </Box>
+        <Flex align="center" gap={6} flexShrink={0}>
+          {gallery.description && (
+            <Text display={{ base: 'none', lg: 'block' }} maxW="30ch" textAlign="right" fontFamily="body"
+                  fontSize="13px" lineHeight={1.5} color="brand.gray">
+              {gallery.description}
+            </Text>
+          )}
+          {/* En celular el carril se desliza con el dedo */}
+          <HStack spacing={2} display={{ base: 'none', md: 'flex' }}>
+            <IconButton aria-label={`Fotos anteriores de ${gallery.name}`} icon={<FiChevronLeft size={16} />}
+                        isDisabled={edges.start} onClick={() => move(-1)} {...arrowStyle} />
+            <IconButton aria-label={`Fotos siguientes de ${gallery.name}`} icon={<FiChevronRight size={16} />}
+                        isDisabled={edges.end} onClick={() => move(1)} {...arrowStyle} />
+          </HStack>
+        </Flex>
+      </Flex>
 
-        {/* Lupa al hover en la central */}
-        {isCenter && (
-          <Flex
-            position="absolute" top={2} left={2}
-            boxSize={{base: '24px',md:"34px"}}
-            fontFamily="heading" fontSize={{base: 'md',md:"xl"}} color="white"
-            align="center" justify="center"
-            borderRadius="full"
-            bg="rgba(5,11,20,0.5)"
-            backdropFilter="blur(6px)"
-            border="1px solid"
-            borderColor="whiteAlpha.200"
-            opacity={0}
-            transition="opacity 0.3s ease"
-            sx={{ '[role=group]:hover &': { opacity: 1 } }}
-          >
-            <Text fontFamily="heading" fontSize="xs" color="white" lineHeight={1}>⤢</Text>
-          </Flex>
-        )}
-      </Box>
-    </MotionBox>
+      <Flex
+        ref={railRef}
+        as="ul"
+        listStyleType="none"
+        m={0}
+        mt={{ base: 4, md: '18px' }}
+        gap={{ base: 2, md: '10px' }}
+        overflowX="auto"
+        pb={1}
+        mr={{ base: -4, md: 0 }}
+        pr={{ base: 4, md: 0 }}
+        tabIndex={0}
+        aria-label={`Fotos de ${gallery.name}`}
+        onScroll={sync}
+        onKeyDown={(e) => {
+          if (e.key === 'ArrowRight') { e.preventDefault(); move(1) }
+          if (e.key === 'ArrowLeft') { e.preventDefault(); move(-1) }
+        }}
+        _focusVisible={{ outline: '2px solid', outlineColor: 'brand.orange', outlineOffset: '4px', borderRadius: '10px' }}
+        sx={{ scrollSnapType: 'x mandatory', scrollbarWidth: 'none', '&::-webkit-scrollbar': { display: 'none' } }}
+      >
+        {gallery.photos.map((p, j) => (
+          <Box as="li" key={p.src + j} flexShrink={0} scrollSnapAlign="start">
+            <Box
+              as="button"
+              type="button"
+              onClick={() => onOpen(j)}
+              aria-label={`Ampliar foto ${j + 1} de ${gallery.photos.length}: ${p.alt}`}
+              display="block"
+              position="relative"
+              w={widthFor(p.shape)}
+              h={{ base: `${RAIL_H.base}px`, md: `${RAIL_H.md}px`, lg: `${RAIL_H.lg}px` }}
+              borderRadius="10px"
+              overflow="hidden"
+              bg="brand.dark3"
+              cursor="zoom-in"
+              _focusVisible={{ outline: '2px solid', outlineColor: 'brand.orange', outlineOffset: '3px' }}
+              sx={{ [HOVER]: { '&:hover img': { transform: 'scale(1.04)' } } }}
+            >
+              <Image
+                src={p.src}
+                alt=""
+                w="100%"
+                h="100%"
+                objectFit="cover"
+                objectPosition={p.pos ?? 'center'}
+                loading={j < 4 ? 'eager' : 'lazy'}
+                draggable={false}
+                transition={`transform .7s ${EASE}`}
+              />
+              <Text as="span" position="absolute" left="10px" bottom="10px" px={2} py="5px" borderRadius="4px"
+                    bg="rgba(26,22,18,0.55)" color="#FCF7F0" fontFamily="heading" fontWeight={700}
+                    fontSize="10px" letterSpacing="0.12em" lineHeight={1}>
+                {String(j + 1).padStart(2, '0')}
+              </Text>
+            </Box>
+          </Box>
+        ))}
+      </Flex>
+    </Box>
   )
 }
 
+// ─── Sección ────────────────────────────────────────────────────────
 export default function GallerySection() {
-  const [current,   setCurrent]   = useState(0)
-  const [lightbox,  setLightbox]  = useState(null)
-  const [stageW,    setStageW]    = useState(0)
+  const galleries = playerData.galleries ?? []
+  const [open, setOpen] = useState(null) // { g, i }
+
   const sectionRef = useRef(null)
-  const titleRef   = useRef(null)
-  const stageRef   = useRef(null)
-  const total      = playerData.gallery.length
+  const headerRef = useRef(null)
 
-  // Medir el ancho del escenario para calcular tamaños en px
+  useScrubReveal(sectionRef, {
+    elements: [{ ref: headerRef, fromVars: { y: 50, opacity: 0 }, vars: { y: 0, opacity: 1 } }],
+    start: 'top 80%',
+    end: 'top 40%',
+  })
+
+  // Una sola entrada coordinada: cada carril sube y aparece al entrar en pantalla.
   useEffect(() => {
-    const el = stageRef.current
-    if (!el) return
-    const ro = new ResizeObserver(([entry]) => setStageW(entry.contentRect.width))
-    ro.observe(el)
-    return () => ro.disconnect()
+    const mm = gsap.matchMedia()
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      const ctx = gsap.context(() => {
+        const items = gsap.utils.toArray('.gal-reveal')
+        gsap.set(items, { opacity: 0, y: 32 })
+        ScrollTrigger.batch(items, {
+          start: 'top 88%',
+          once: true,
+          onEnter: (batch) => gsap.to(batch, { opacity: 1, y: 0, duration: 1, ease: 'expo.out', stagger: 0.1, overwrite: true }),
+        })
+      }, sectionRef)
+      return () => ctx.revert()
+    })
+    return () => mm.revert()
   }, [])
 
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.fromTo(titleRef.current,
-        { y: 36, opacity: 0 },
-        {
-          y: 0, opacity: 1, duration: 0.9, ease: 'power3.out',
-          scrollTrigger: { trigger: titleRef.current, start: 'top 85%', once: true },
-        }
-      )
-    }, sectionRef)
-    return () => ctx.revert()
-  }, [])
-
-  const prev = useCallback(() => setCurrent((c) => (c - 1 + total) % total), [total])
-  const next = useCallback(() => setCurrent((c) => (c + 1) % total), [total])
-
-  useEffect(() => {
-    const handler = (e) => {
-      if (lightbox !== null) return
-      if (e.key === 'ArrowRight') next()
-      if (e.key === 'ArrowLeft')  prev()
-    }
-    window.addEventListener('keydown', handler)
-    return () => window.removeEventListener('keydown', handler)
-  }, [lightbox, next, prev])
-
-  // offset circular para loop infinito
-  const circularOffset = (i) => {
-    let o = i - current
-    if (o > total / 2)  o -= total
-    if (o < -total / 2) o += total
-    return o
-  }
-
-  const cardW   = Math.max(180, Math.min(stageW * 0.4, 440))
-  const spacing = cardW * 0.62
-
-  const onDragEnd = (_e, info) => {
-    const threshold = 70
-    if (info.offset.x < -threshold || info.velocity.x < -350) next()
-    else if (info.offset.x > threshold || info.velocity.x > 350) prev()
-  }
+  if (!galleries.length) return null
 
   return (
     <Box
       as="section"
       id="galeria"
       ref={sectionRef}
+      aria-labelledby="galeria-title"
       bg="brand.dark"
-      minH="100vh"
-      py={{ base: 16, lg: 20 }}
-      overflow="hidden"
-      position="relative"
+      pt={{ base: 16, lg: 20 }}
+      pb={{ base: 16, lg: 24 }}
+      px={{ base: 4, md: 8, lg: 10 }}
+      sx={{ overflow: 'clip' }}
     >
-      {/* glow ambiental */}
-      <Box
-        position="absolute" top={{base:'16%',md:"10%"}} left="50%" transform="translateX(-50%)"
-        w="70vw" h="40vw" maxW="900px"
-        background="radial-gradient(ellipse, #bda78e1a 0%, transparent 70%)"
-        pointerEvents="none"
-      />
-
-      <Box maxW="1400px" mx="auto" px={{ base: 2, lg: 0 }} position="relative">
-        <Flex align="flex-end" justify="space-between" mb={{ base: 8, md: 10 }} ref={titleRef}>
+      <Box maxW="1400px" mx="auto">
+        <Flex ref={headerRef} justify="space-between" align="flex-end" gap={6} wrap="wrap">
           <Box>
-            <Text fontFamily='mono' fontSize="10px" color="brand.bone"
-                  textTransform="uppercase" letterSpacing="widest">
+            <Text fontFamily="mono" fontSize="10px" color="brand.bone" textTransform="uppercase" letterSpacing="0.28em">
               Fotos
             </Text>
-            <Text as="h2" fontFamily='heading' fontWeight="bold" fontSize={{ base: '4xl', lg: '5xl' }}
-                  color="brand.amber" lineHeight={1}>
+            <Text as="h2" id="galeria-title" fontFamily="heading" fontWeight="bold"
+                  fontSize={{ base: '4xl', lg: '5xl' }} color="brand.amber" lineHeight={1} mt={2}>
               Galería
             </Text>
           </Box>
-          <Text fontFamily="mono" fontSize="sm" color="brand.gray" letterSpacing="wider">
-            {String(current + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}
+          <Text maxW="44ch" fontFamily="body" fontSize={{ base: '13px', md: '14px' }} lineHeight={1.6} color="brand.gray">
+            Sus galerías a la vista, una debajo de la otra. Deslizá cada carril o usá sus flechas.
           </Text>
         </Flex>
+
+        {galleries.map((g, i) => (
+          <Lane key={g.key} gallery={g} first={i === 0} onOpen={(j) => setOpen({ g: i, i: j })} />
+        ))}
       </Box>
 
-      {/* Escenario 3D */}
-      <Box
-        ref={stageRef}
-        position="relative"
-        h={{ base: '420px', md: '500px', lg: '560px' }}
-        sx={{ perspective: '1800px' }}
-        overflow="hidden"
-      >
-        {/* Sombra de piso bajo la central */}
-        <Box
-          position="absolute" bottom="8%" left="50%" transform="translateX(-50%)"
-          w={`${cardW * 0.9}px`} h="40px"
-          background="radial-gradient(ellipse, rgba(0,0,0,0.55) 0%, transparent 70%)"
-          filter="blur(10px)"
-          pointerEvents="none"
-          zIndex={0}
-        />
-
-        {/* Capa de arrastre */}
-        <MotionBox
-          position="absolute" inset={0}
-          drag="x"
-          dragConstraints={{ left: 0, right: 0 }}
-          dragElastic={0.12}
-          onDragEnd={onDragEnd}
-          style={{ transformStyle: 'preserve-3d' }}
-          role="group"
-        >
-          {playerData.gallery.map((photo, i) => {
-            const offset = circularOffset(i)
-            const abs = Math.abs(offset)
-            if (abs > 2) return null
-            return (
-              <GalleryCard
-                key={photo.id}
-                photo={photo}
-                offset={offset}
-                abs={abs}
-                cardW={cardW}
-                spacing={spacing}
-                total={total}
-                index={i}
-                onFocus={() => setCurrent(i)}
-                onZoom={() => setLightbox(i)}
-              />
-            )
-          })}
-        </MotionBox>
-
-        {/* Fades laterales */}
-        <Box position="absolute" left={0} top={0} bottom={0} w={{ base: '8%', lg: '14%' }}
-             bgGradient="linear(to-r, brand.dark, transparent)" zIndex={30} pointerEvents="none" />
-        <Box position="absolute" right={0} top={0} bottom={0} w={{ base: '8%', lg: '14%' }}
-             bgGradient="linear(to-l, brand.dark, transparent)" zIndex={30} pointerEvents="none" />
-      </Box>
-
-      {/* Controles */}
-      <Box maxW="1400px" mx="auto" px={{ base: 5, lg: 10 }} mt={{ base: 6, md: 10 }}>
-        <Flex align="center" justify="center" gap={{ base: 4, md: 6 }}>
-          {/* Flecha izq */}
-          <Box
-            as="button" onClick={prev} aria-label="Anterior"
-            boxSize="44px" flexShrink={0}
-            display="flex" alignItems="center" justifyContent="center"
-            border="1px solid" borderColor="brand.amber" borderRadius="full"
-            color="brand.bone" transition="all 0.25s" 
-            _hover={{ bg: '#bda78e1a', color: 'brand.gray2' }}
-            _active={{ transform: 'scale(0.92)' }}
-          >
-            <Text fontFamily="heading" fontSize="4xl" lineHeight={1} pt="2px">‹</Text>
-          </Box>
-
-          {/* Tira de miniaturas */}
-          <Flex gap={2} align="center" overflowX="auto" py={1}
-                sx={{ '&::-webkit-scrollbar': { display: 'none' } }}>
-            {playerData.gallery.map((photo, i) => {
-              const active = i === current
-              return (
-                <Box
-                  key={photo.id}
-                  as="button"
-                  onClick={() => setCurrent(i)}
-                  flexShrink={0}
-                  w={active ? { base: '54px', md: '70px' } : { base: '40px', md: '48px' }}
-                  h={{ base: '40px', md: '48px' }}
-                  borderRadius="md"
-                  overflow="hidden"
-                  position="relative"
-                  border="1px solid"
-                  borderColor={active ? 'brand.brown' : 'whiteAlpha.200'}
-                  boxShadow={active ? '0 0 0 2px rgba(30,95,168,0.4)' : 'none'}
-                  opacity={active ? 1 : 0.5}
-                  transition="all 0.3s ease"
-                  _hover={{ opacity: 1 }}
-                >
-                  <Image src={photo.src} alt={photo.alt}
-                         w="100%" h="100%" objectFit="cover" draggable={false} />
-                </Box>
-              )
-            })}
-          </Flex>
-
-          {/* Flecha der */}
-          <Box
-            as="button" onClick={next} aria-label="Siguiente"
-            boxSize="44px" flexShrink={0}
-            display="flex" alignItems="center" justifyContent="center"
-            border="1px solid" borderColor="brand.amber" borderRadius="full"
-            color="brand.bone" transition="all 0.25s"
-            _hover={{ bg: '#bda78e1a', color: 'brand.gray2' }}
-            _active={{ transform: 'scale(0.92)' }}
-          >
-            <Text fontFamily="heading" fontSize="4xl" lineHeight={1} pt="2px">›</Text>
-          </Box>
-        </Flex>
-      </Box>
-
-      <AnimatePresence>
-        {lightbox !== null && (
-          <Lightbox
-            photo={playerData.gallery[lightbox]}
-            onClose={() => setLightbox(null)}
-            onPrev={() => setLightbox((l) => (l - 1 + total) % total)}
-            onNext={() => setLightbox((l) => (l + 1) % total)}
-          />
-        )}
-      </AnimatePresence>
+      <Lightbox
+        gallery={open ? galleries[open.g] : null}
+        index={open?.i ?? 0}
+        onClose={() => setOpen(null)}
+        onGo={(i) => setOpen((o) => ({ ...o, i }))}
+      />
     </Box>
   )
 }
