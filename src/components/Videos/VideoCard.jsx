@@ -1,244 +1,136 @@
-import { useState } from 'react'
-import { Box, Flex, Text, AspectRatio } from '@chakra-ui/react'
-import { keyframes } from '@emotion/react'
-import { FiPlay } from 'react-icons/fi'
+import { useEffect, useState } from 'react'
+import { Box, Flex, Text } from '@chakra-ui/react'
 import { FaInstagram } from 'react-icons/fa'
+import { playerData } from '../../data/playerData'
 
-// Pulso del anillo del botón play
-const pulse = keyframes`
-  0%   { transform: scale(1);   opacity: 0.5; }
-  70%  { transform: scale(1.7); opacity: 0; }
-  100% { transform: scale(1.7); opacity: 0; }
-`
-// Barrido de brillo diagonal al hover
-const sheen = keyframes`
-  0%   { transform: translateX(-130%) skewX(-18deg); opacity: 0; }
-  35%  { opacity: 0.5; }
-  100% { transform: translateX(230%) skewX(-18deg); opacity: 0; }
-`
-// Anillo cónico que gira alrededor del play
-const spin = keyframes`
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
-`
-// Parpadeo del punto REC
-const blink = keyframes`
-  0%, 100% { opacity: 1; }
-  50%      { opacity: 0.2; }
-`
+// ─── Pantalla del "Programa" ─────────────────────────────────────────
+// Reel vertical (9:16) con portada. Al tocarlo se reproduce dentro de la
+// misma card (embed de Instagram). Al cambiar de video vuelve a la portada.
 
-export function VideoCard({ video, index = 0, onOpen }) {
-  const [hovered, setHovered] = useState(false)
+const EASE = 'cubic-bezier(0.23,1,0.32,1)'
+const HOVER = '@media (hover: hover) and (pointer: fine)'
 
+function PlayIcon() {
   return (
-    <Box
-      className="video-card"
-      position="relative"
-      cursor="pointer"
-      role="group"
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      onClick={() => onOpen(video)}
-      transition="transform 0.5s ease, filter 0.5s ease"
-      transform={hovered ? 'translateY(-6px)' : 'translateY(0)'}
-      sx={{
-        filter: {
-          base: 'none',
-          md: hovered
-            ? 'drop-shadow(0 30px 55px rgba(0,0,0,0.55))'
-            : 'drop-shadow(0 18px 40px rgba(0,0,0,0.45))',
-        },
-      }}
-    >
-      <AspectRatio ratio={9 / 16}>
-        <Box
-          position="relative"
-          overflow="hidden"
-          bg="#0c0d0d"
-          borderRadius="5px"
-          boxShadow="inset 0 0 0 1px rgba(255,255,255,0.08)"
-        >
-          {/* cover (Instagram no permite autoplay en iframe, se mantiene el cover con zoom) */}
-          <Box
-            as="img"
-            src={video.cover}
-            alt={video.title}
-            position="absolute"
-            inset={0}
-            w="100%"
-            h="100%"
-            objectFit="cover"
-            objectPosition="center 40%"
-            transition="opacity 0.5s ease, transform 0.7s ease"
-            transform={hovered ? 'scale(1.06)' : 'scale(1)'}
-          />
-
-          {/* gradiente + viñeta + scanlines */}
-          <Box
-            position="absolute"
-            inset={0}
-            pointerEvents="none"
-            bg="linear-gradient(180deg, rgba(10,5,5,0.15) 0%, rgba(10,5,5,0.1) 40%, rgba(10,5,5,0.85) 100%)"
-          />
-          <Box
-            position="absolute"
-            inset={0}
-            pointerEvents="none"
-            background="radial-gradient(ellipse at center, transparent 42%, rgba(3,6,10,0.8) 125%)"
-            opacity={hovered ? 1 : 0.4}
-            transition="opacity 0.5s ease"
-          />
-          <Box
-            position="absolute"
-            inset={0}
-            pointerEvents="none"
-            zIndex={2}
-            opacity={hovered ? 0.5 : 0.22}
-            transition="opacity 0.5s ease"
-            sx={{
-              background:
-                'repeating-linear-gradient(180deg, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 1px, transparent 2px, transparent 4px)',
-            }}
-          />
-
-          {/* badge REC + categoría */}
-          <Flex
-            position="absolute"
-            top={3}
-            left={3}
-            align="center"
-            gap="6px"
-            bg="rgba(10,5,5,0.55)"
-            backdropFilter="blur(6px)"
-            border="1px solid"
-            borderColor="brand.amber"
-            px="8px"
-            py="4px"
-            borderRadius="5px"
-            zIndex={4}
-          >
-            <Box w="6px" h="6px" borderRadius="full" bg="brand.rec" animation={`${blink} 1.6s ease-in-out infinite`} />
-            <Text fontFamily="mono" fontSize="9px" letterSpacing="0.24em" textTransform="uppercase" color="white">
-              {video.category}
-            </Text>
-          </Flex>
-
-          {/* marcador de fuente: Instagram */}
-          <Flex
-            position="absolute"
-            top={3}
-            right={3}
-            align="center"
-            justify="center"
-            w="26px"
-            h="26px"
-            borderRadius="7px"
-            bg="rgba(10,5,5,0.55)"
-            backdropFilter="blur(6px)"
-            border="1px solid"
-            borderColor="whiteAlpha.300"
-            zIndex={4}
-            transition="border-color 0.4s ease, background 0.4s ease"
-            _groupHover={{ borderColor: 'brand.amber', bg: 'rgba(189,167,142,0.25)' }}
-          >
-            <Box as={FaInstagram} fontSize="14px" color="white" />
-          </Flex>
-
-          {/* botón play central */}
-          <Flex position="absolute" inset={0} align="center" justify="center" zIndex={5}>
-            <Box
-              position="relative"
-              w="54px"
-              h="54px"
-              transition="transform 0.45s cubic-bezier(0.22,1,0.36,1)"
-              transform={hovered ? 'scale(1.12)' : 'scale(1)'}
-            >
-              <Box position="absolute" inset={0} borderRadius="full" border="1px solid" borderColor="brand.amber" animation={`${pulse} 2.8s ease-out infinite`} />
-              <Box position="absolute" inset={0} borderRadius="full" border="1px solid" borderColor="brand.amber" animation={`${pulse} 2.8s ease-out infinite 1.4s`} />
-              <Box
-                position="absolute"
-                inset="-6px"
-                borderRadius="full"
-                opacity={hovered ? 1 : 0}
-                transition="opacity 0.4s ease"
-                sx={{
-                  background:
-                    'conic-gradient(from 0deg, transparent 0deg, #bda78ee6 80deg, #7a4e1f 150deg, transparent 220deg, transparent 360deg)',
-                  WebkitMask: 'radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 2px))',
-                  mask: 'radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 2px))',
-                }}
-                animation={`${spin} 4s linear infinite`}
-              />
-              <Box position="absolute" inset="-6px" borderRadius="full" border="1px solid" borderColor="whiteAlpha.200" />
-              <Flex
-                position="absolute"
-                inset={0}
-                align="center"
-                justify="center"
-                borderRadius="full"
-                border="1px solid"
-                borderColor="whiteAlpha.700"
-                bg="rgba(10,5,5,0.4)"
-                backdropFilter="blur(10px)"
-                transition="all 0.4s ease"
-                boxShadow={hovered ? '0 0 28px rgba(189,167,142,0.55)' : 'none'}
-                _groupHover={{ bg: 'rgba(189,167,142,0.5)', borderColor: 'white' }}
-              >
-                <Box as={FiPlay} fontSize="20px" ml="3px" color="white" />
-              </Flex>
-            </Box>
-          </Flex>
-
-          {/* etiqueta estática (visible siempre, se oculta al hover) */}
-          <Flex
-            position="absolute"
-            bottom={3}
-            left={3}
-            right={3}
-            align="flex-end"
-            justify="space-between"
-            gap={2}
-            zIndex={4}
-            opacity={hovered ? 0 : 1}
-            transition="opacity 0.35s ease"
-            pointerEvents="none"
-          >
-            <Text fontFamily="heading" fontSize="xl" lineHeight={1} color="white" noOfLines={1}>
-              {video.title}
-            </Text>
-            <Text fontFamily="mono" fontSize="11px" letterSpacing="0.2em" color="brand.amber" flexShrink={0}>
-              {`0${index + 1}`}
-            </Text>
-          </Flex>
-
-          {/* título al hover (sube desde abajo) */}
-          <Box
-            position="absolute"
-            bottom={4}
-            left={4}
-            right={4}
-            zIndex={4}
-            opacity={hovered ? 1 : 0}
-            transform={hovered ? 'translateY(0)' : 'translateY(14px)'}
-            transition="opacity 0.45s ease 0.05s, transform 0.45s cubic-bezier(0.22,1,0.36,1) 0.05s"
-            pointerEvents="none"
-          >
-            <Text fontFamily="mono" fontSize="8px" letterSpacing="0.26em" textTransform="uppercase" color="brand.amber" mb={1}>
-              Jugadas destacadas
-            </Text>
-            <Text fontFamily="heading" fontSize="2xl" lineHeight={1} color="white" letterSpacing="0.01em" noOfLines={1}>
-              {video.season}
-            </Text>
-          </Box>
-
-          {/* sheen diagonal */}
-          <Box position="absolute" inset={0} overflow="hidden" pointerEvents="none" zIndex={2}>
-            {hovered && (
-              <Box position="absolute" top={0} bottom={0} left={0} w="40%" background="linear-gradient(90deg, transparent, rgba(255,255,255,0.16), transparent)" animation={`${sheen} 1.1s ease-out`} />
-            )}
-          </Box>
-        </Box>
-      </AspectRatio>
+    <Box as="svg" viewBox="0 0 24 24" boxSize={{ base: '22px', lg: '24px' }} ml="3px" aria-hidden="true">
+      <path fill="currentColor" d="M7 4.5v15l13-7.5z" />
     </Box>
   )
 }
+
+export function VideoCard({ video, index = 0 }) {
+  const [playing, setPlaying] = useState(false)
+  useEffect(() => setPlaying(false), [video.instagramId])
+
+  const name = playerData.shortName ?? playerData.displayName
+  const play = () => setPlaying(true)
+
+  return (
+    <Box
+      role={playing ? undefined : 'button'}
+      tabIndex={playing ? undefined : 0}
+      aria-label={playing ? undefined : `Reproducir ${video.title}`}
+      onClick={playing ? undefined : play}
+      onKeyDown={(e) => {
+        if (!playing && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); play() }
+      }}
+      position="relative"
+      w="100%"
+      h="100%"
+      borderRadius={{ base: '14px', lg: '16px' }}
+      overflow="hidden"
+      bg="#0c0b0a"
+      cursor={playing ? 'default' : 'pointer'}
+      boxShadow="0 30px 60px rgba(26,22,18,0.22)"
+      sx={{
+        isolation: 'isolate',
+        [HOVER]: {
+          '&:hover .vc-cover': { transform: 'scale(1.05)' },
+          '&:hover .vc-play': { transform: 'scale(1.08)' },
+        },
+      }}
+      _focusVisible={{ outline: '2px solid', outlineColor: 'brand.orange', outlineOffset: '4px' }}
+    >
+      <Box
+        as="img"
+        className="vc-cover"
+        src={video.cover}
+        alt={`${name} · ${video.title}`}
+        position="absolute"
+        inset={0}
+        w="100%"
+        h="100%"
+        objectFit="cover"
+        objectPosition={video.pos ?? 'center 35%'}
+        transition={`transform .7s ${EASE}`}
+        draggable={false}
+      />
+      <Box position="absolute" inset={0} zIndex={1} pointerEvents="none"
+           bg="linear-gradient(180deg, rgba(26,22,18,0.12) 0%, transparent 35%, rgba(26,22,18,0.86) 100%)" />
+
+      {!playing && (
+        <>
+          <Flex position="absolute" top={3} left={3} zIndex={3} align="center" gap="6px" px="9px" py="5px"
+                borderRadius="5px" bg="rgba(26,22,18,0.55)" border="1px solid" borderColor="rgba(212,165,116,0.7)"
+                sx={{ backdropFilter: 'blur(6px)' }}>
+            <Box w="6px" h="6px" borderRadius="full" bg="brand.rec" />
+            <Text fontFamily="mono" fontSize="9px" fontWeight={500} letterSpacing="0.24em"
+                  textTransform="uppercase" color="#FCF7F0" lineHeight={1}>
+              {video.category}
+            </Text>
+          </Flex>
+          <Flex position="absolute" top={3} right={3} zIndex={3} boxSize="28px" borderRadius="7px"
+                align="center" justify="center" bg="rgba(26,22,18,0.55)" border="1px solid"
+                borderColor="rgba(252,247,240,0.3)" color="#FCF7F0">
+            <Box as={FaInstagram} boxSize="14px" />
+          </Flex>
+
+          <Flex className="vc-play" position="absolute" left="50%" top="50%" zIndex={3}
+                boxSize={{ base: '64px', lg: '76px' }} ml={{ base: '-32px', lg: '-38px' }} mt={{ base: '-32px', lg: '-38px' }}
+                borderRadius="full" align="center" justify="center" bg="brand.dorado" color="brand.amber"
+                boxShadow="0 10px 30px rgba(26,22,18,0.35)" transition={`transform .4s ${EASE}`}>
+            <PlayIcon />
+          </Flex>
+
+          <Flex position="absolute" left="14px" right="14px" bottom="14px" zIndex={3}
+                justify="space-between" align="flex-end" gap={2.5} color="#FCF7F0">
+            <Box minW={0}>
+              <Text fontFamily="heading" fontWeight={700} fontSize="18px" lineHeight={1.05}
+                    textTransform="uppercase" noOfLines={1}>
+                {video.title}
+              </Text>
+              <Text mt="6px" fontFamily="mono" fontSize="9px" fontWeight={500} letterSpacing="0.22em"
+                    textTransform="uppercase" color="brand.dorado">
+                {video.league} {video.year}
+              </Text>
+            </Box>
+            <Text fontFamily="heading" fontWeight={700} fontSize="11px" letterSpacing="0.2em" color="brand.dorado">
+              {String(index + 1).padStart(2, '0')}
+            </Text>
+          </Flex>
+        </>
+      )}
+
+      {playing && (
+        <Box
+          as="iframe"
+          src={`https://www.instagram.com/reel/${video.instagramId}/embed`}
+          title={`${name} | ${video.title}`}
+          position="absolute"
+          inset={0}
+          w="100%"
+          h="100%"
+          zIndex={6}
+          bg="#000"
+          border="none"
+          scrolling="no"
+          allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+          referrerPolicy="strict-origin-when-cross-origin"
+          allowFullScreen
+        />
+      )}
+    </Box>
+  )
+}
+
+export default VideoCard

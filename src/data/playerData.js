@@ -154,44 +154,41 @@ export const playerData = {
 
   ],
 
+  // Videos — diseño "Programa": uno en pantalla y la lista para cambiarlo.
+  //  title   → título grande · text → una línea de contexto
+  //  year / league / club → ficha del video (club: por defecto currentClub)
   videos: [
     {
       id: 'v2',
       instagramId: 'DPP_syMDWD5',
-      title: 'Asistencia',
-      fullTitle: 'Ivan Colman | Asistencias \'26',
-      season: 'Asistencias Cusco F.C.',
-      league: 'LIGA 1 2025',
-      thumbnail: image2,
+      title: 'Asistencias',
+      category: 'Asistencias',
+      text: 'Una por una, las asistencias que lo pusieron arriba en la Liga 1.',
+      year: 2025,
+      league: 'Liga 1',
       cover: image2,
-      category: 'Asistencia',
     },
     {
       id: 'v3',
       instagramId: 'DVjGHikDaUC',
-      title: 'Highlights \'25',
-      fullTitle: 'Ivan Colman | Highlights \'25',
-      season: 'Highlights Cusco F.C. \'25',
-      league: 'LIGA 1 2025',
-      thumbnail: image10,
-      cover: image10,
+      title: "Highlights '25",
       category: 'Highlights',
+      text: 'Jugadas destacadas de su temporada 2025 con Cusco F.C.',
+      year: 2025,
+      league: 'Liga 1',
+      cover: image10,
     },
-    
     {
       id: 'v4',
       instagramId: 'DCmfAbFpTpl',
-      title: 'Highlights \'24',
-      fullTitle: 'Ivan Colman | Highlights \'24',
-      season: 'Highlights Cusco F.C. \'24',
-      league: 'LIGA 1 2024',
-      thumbnail: image4,
-      cover: image4,
+      title: "Highlights '24",
       category: 'Highlights',
+      text: 'Su primera temporada en Cusco F.C., en la Liga 1 de Perú.',
+      year: 2024,
+      league: 'Liga 1',
+      cover: image4,
     },
   ],
-
-
 
   gallery: [
     { id: 1, src: image1, alt: 'Ivan Colman', caption: 'Cusco F.C.', category: 'Partido', aspect: 'wide' },
