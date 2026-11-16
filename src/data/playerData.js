@@ -280,27 +280,48 @@ export const playerData = {
     },
   ],
 
-   press: [
-    {
-      media: 'Liga 1 TeApuesto',
-      logo:  logo3,
-      title: '¡𝗘𝗹 𝗰𝗼𝗻𝗱𝘂𝗰𝘁𝗼𝗿 𝗲𝗹𝗲𝗴𝗶𝗱𝗼 𝗱𝗲 𝗹𝗮 𝗳𝗲𝗰𝗵𝗮! Iván Colman es el Jugador al Volante @indrive.pe de la Fecha 1 tras su gol y asistencia en la victoria de Cusco FC. 🟡⚫️',
-      date:  'Julio 2025 ',
-      url:   'https://www.instagram.com/p/DbELHTxEja7/',
-    },
+  // Prensa — diseño "Zócalo": cada nota como el gráfico de una transmisión.
+  //  title    → titular del zócalo (texto limpio, sin letras Unicode ni emojis)
+  //  quote    → texto de la publicación (queda como referencia; no se muestra)
+  //  stat     → dato del recuadro dorado · image/pos → foto de fondo y su encuadre
+  //  featured → la nota que se ve primero
+  press: [
     {
       media: 'Liga1 Max',
       logo:  logo3,
-      title: 'DIRECTOR DE ORQUESTA 🎻\n\nIván Colman lidera el torneo con 328 pases completados y una precisión del 85.19%.',
+      type:  'Publicación en Instagram',
       date:  'Marzo 2026',
       url:   'https://www.instagram.com/p/DVjGHikDaUC/',
+      title: 'Director de orquesta',
+      quote: 'Iván Colman lidera el torneo con 328 pases completados y una precisión del 85,19%.',
+      stat:  { value: '328', label: 'pases completados' },
+      image: image33,
+      pos:   'center 40%',
     },
     {
-      media: 'Oneftbol  ',
+      media: 'OneFootball',
       logo:  logo1,
-      title: 'Todo equipo necesita al jugador de los buenos pases, y Cusco tiene a @ivan_colman8 🇦🇷. Con 31 asistencias, se convirtió en el jugador más asistidor de los últimos 5 años de la Liga 1.',
+      type:  'Publicación en Instagram',
       date:  'Diciembre 2025',
       url:   'https://www.instagram.com/p/DS79VnxDv5p/',
+      title: 'El más asistidor de los últimos 5 años de la Liga 1',
+      quote: 'Todo equipo necesita al jugador de los buenos pases, y Cusco tiene a Iván Colman. Con 31 asistencias, se convirtió en el jugador más asistidor de los últimos 5 años de la Liga 1.',
+      stat:  { value: '31', label: 'asistencias' },
+      image: image28,
+      pos:   'center 8%',
+      featured: true,
+    },
+    {
+      media: 'Liga 1 TeApuesto',
+      logo:  logo3,
+      type:  'Publicación en Instagram',
+      date:  'Julio 2025',
+      url:   'https://www.instagram.com/p/DbELHTxEja7/',
+      title: 'El conductor elegido de la fecha',
+      quote: 'Iván Colman es el Jugador al Volante de la Fecha 1 tras su gol y asistencia en la victoria de Cusco FC.',
+      stat:  { value: 'F1', label: 'jugador de la fecha' },
+      image: image37,
+      pos:   'center 18%',
     },
   ],
 

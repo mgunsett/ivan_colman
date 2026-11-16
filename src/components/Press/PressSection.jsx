@@ -1,210 +1,328 @@
-import { useRef, useEffect } from 'react'
-import { Box, Grid, Text, Flex, VStack, HStack, Link, Image, useToken } from '@chakra-ui/react'
-import { FaStar } from 'react-icons/fa'
+import { useEffect, useRef, useState } from 'react'
+import { Box, Flex, Image, Text } from '@chakra-ui/react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import useScrubReveal from '../../hooks/useScrubReveal'
+
 import { playerData } from '../../data/playerData'
+import useScrubReveal from '../../hooks/useScrubReveal'
 
 gsap.registerPlugin(ScrollTrigger)
 
-function getInitials(name = '') {
-  return name
-    .trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((w) => w[0])
-    .join('')
-    .toUpperCase()
-}
+// ─── Prensa: diseño "Zócalo" ────────────────────────────────────────
+// Cada nota se ve como el gráfico de una transmisión: una pantalla con
+// la foto en blanco y negro y, encima, un zócalo translúcido con el logo
+// del medio, el titular y el dato de la nota. Debajo, un "canal" por
+// medio para cambiarla. Al cambiar con el mouse o el dedo, el zócalo
+// entra con un barrido; con el teclado el cambio es inmediato.
 
-function Stars({ count = 5 }) {
+const EASE = 'cubic-bezier(0.23,1,0.32,1)'
+const HOVER = '@media (hover: hover) and (pointer: fine)'
+const REDUCED = '@media (prefers-reduced-motion: reduce)'
+const SWAP_MS = 180
+
+const glass = (bg, blur = 12) => ({
+  background: bg,
+  backdropFilter: `blur(${blur}px) saturate(1.1)`,
+  WebkitBackdropFilter: `blur(${blur}px) saturate(1.1)`,
+})
+
+function Zocalo({ note, wiping }) {
   return (
-    <HStack spacing={1}>
-      {Array.from({ length: 5 }).map((_, i) => (
-        <Box key={i} as={FaStar} boxSize="14px"
-          color={i < count ? 'brand.amber' : 'whiteAlpha.200'} 
-          _groupHover={{ color: 'brand.dorado' }}
-          />
-      ))}
-    </HStack>
-  )
-}
-
-function PressCard({ article, index }) {
-  const cardRef = useRef(null)
-  const [panel, brownDark, amber, amberLight] = useToken('colors', ['brand.panel', 'brand.brownDark', 'brand.amber', 'brand.amberLight'])
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.fromTo(cardRef.current,
-        { y: 40, opacity: 0 },
-        {
-          y: 0, opacity: 1, duration: 0.8,
-          delay: index * 0.12,
-          ease: 'power3.out',
-          scrollTrigger: { trigger: cardRef.current, start: 'top 88%', once: true },
-        }
-      )
-    })
-    return () => ctx.revert()
-  }, [index])
-
-  return (
-    <Box ref={cardRef} role="group" style={{ opacity: 0 }}>
-      {/* Burbuja */}
-      <Box
-        as={Link}
-        href={article.url}
-        isExternal
-        display="block"
-        textDecoration="none"
-        bg="brand.dark"
-        border="1px solid"
-        borderColor="brand.amberLight"
-        borderRadius="lg"
-        p={6}
-        position="relative"
-        transition="border-color 0.35s, transform 0.35s, background 0.35s"
-        _after={{
-          content: '""', position: 'absolute', bottom: '-10px', left: 8,
-          w: 0, h: 0,
-          borderLeft: '10px solid transparent',
-          borderRight: '10px solid transparent',
-          borderTop: `10px solid ${amberLight}`,
-          filter: 'drop-shadow(0 1px 0 rgba(255,255,255,0.06))',
-          _groupHover: { borderTopColor: amber },
-        }}
-        _groupHover={{
-          borderColor: 'brand.amber',
-          transform: 'translateY(-4px)',
-          bg: 'brand.panel',
-          _before: { width: '40px' },
-          textDecoration: 'none',
-        }}
+    <Box
+      position="absolute"
+      zIndex={2}
+      left={{ base: 3, md: 5, lg: 10 }}
+      right={{ base: 3, lg: 'auto' }}
+      bottom={{ base: 3, md: 5, lg: 9 }}
+      maxW={{ lg: 'calc(100% - 80px)' }}
+      display="grid"
+      gridTemplateColumns="auto minmax(0,1fr) auto"
+      alignItems="stretch"
+      sx={{
+        clipPath: wiping ? 'inset(0 100% 0 0)' : 'inset(0 0 0 0)',
+        transition: wiping ? 'none' : `clip-path .32s ${EASE}`,
+        [REDUCED]: { clipPath: 'none', opacity: wiping ? 0 : 1, transition: wiping ? 'none' : 'opacity .2s ease' },
+      }}
+    >
+      {/* Logo del medio */}
+      <Flex
+        align="center"
+        justify="center"
+        w={{ base: '48px', md: '64px', lg: '76px' }}
+        borderLeftRadius="10px"
+        sx={glass('rgba(252,247,240,0.88)')}
       >
-        <VStack align="start" spacing={4}>
-          <Flex justify="space-between" align="center" w="100%">
-            <Stars count={article.rating ?? 5} />
-            <Box
-              px={2.5} py={1}
-              bg="transparent"
-              border="1px solid"
-              borderColor="brand.amber"
-              borderRadius="sm"
-              transition="border-color 0.35s, background 0.35s"
-              _groupHover={{ bg: 'brand.gray2' }}
-              >
-                <Text fontFamily="mono" fontSize="9px" color="brand.amber"
-                textTransform="uppercase" letterSpacing="0.18em"
-                _groupHover={{ color: 'brand.dark '}}
-                >
-                {article.media}
-              </Text>
-            </Box>
-          </Flex>
+        <Image src={note.logo} alt="" boxSize={{ base: '30px', md: '40px', lg: '46px' }} objectFit="contain" />
+      </Flex>
 
-          <Text fontFamily="body" fontSize={{base:'xs',md:"md"}} color="brand.gray" lineHeight={1.55} _groupHover={{ color: 'brand.bone' }}>
-            “{article.title}”
+      {/* Medio, link y titular */}
+      <Flex direction="column" justify="center" minW={0} px={{ base: 3, md: '22px' }} py={{ base: '11px', md: '14px' }}
+            color="#FCF7F0" sx={glass('rgba(26,22,18,0.48)', 14)}>
+        <Flex align="center" gap={{ base: 2.5, md: 3.5 }} wrap="wrap">
+          <Text fontFamily="body" fontWeight={500} fontSize={{ base: '11px', md: '12px' }} lineHeight={1} color="#E8D5C3">
+            {note.media}, {note.date.toLowerCase()}
           </Text>
-
-          <Text fontFamily="mono" fontSize="11px" color="brand.gray2"
-            textTransform="uppercase" letterSpacing="0.18em"
-            transition="color 0.25s"
-            _groupHover={{ color: 'brand.rec' }}>
-            Leer más →
-          </Text>
-        </VStack>
-      </Box>
-
-      {/* Autor */}
-      <HStack spacing={3} mt={5} pl={2}>
-        <Flex
-          boxSize="42px"
-          flexShrink={0}
-          borderRadius="full"
-          overflow="hidden"
-          align="center"
-          justify="center"
-          bg={`linear-gradient(135deg, ${brownDark}, ${amber})`}
-          border="1px solid"
-          borderColor="brand.amber"
-          transition="border-color 0.35s, box-shadow 0.35s"
-          _groupHover={{
-            borderColor: 'brand.brown',
-            boxShadow: '0 0 0 3px #bda78e44',
-          }}
-        >
-          {article.logo ? (
-            <Image
-              src={article.logo}
-              alt={`Logo de ${article.media}`}
-              boxSize="100%"
-              objectFit="cover"
-              objectPosition="center"
-              loading="lazy"
-            />
-          ) : (
-            <Text fontFamily="heading" fontSize="lg" color="white" lineHeight={1}>
-              {getInitials(article.media)}
-            </Text>
-          )}
+          <Box
+            as="a"
+            href={note.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            fontFamily="heading"
+            fontWeight={700}
+            fontSize={{ base: '11px', md: '12px' }}
+            lineHeight={1}
+            color="brand.dorado"
+            pb="4px"
+            borderBottom="1.5px solid"
+            borderColor="rgba(212,165,116,0.5)"
+            transition="border-color .2s ease"
+            _focusVisible={{ outline: '2px solid', outlineColor: 'brand.dorado', outlineOffset: '4px' }}
+            sx={{ [HOVER]: { '&:hover': { borderColor: 'brand.dorado' } } }}
+          >
+            Ver la publicación
+          </Box>
         </Flex>
-        <Box>
-          <Text fontFamily="heading" fontSize="lg" color="brand.dorado" lineHeight={1} _groupHover={{ color: 'brand.amber' }}>
-            {article.media}
+        <Text
+          as="h3"
+          mt={{ base: '6px', md: 2 }}
+          fontFamily="heading"
+          fontWeight={700}
+          fontSize={{ base: '16px', md: '22px', lg: 'clamp(20px, 2.1vw, 30px)' }}
+          lineHeight={1}
+          letterSpacing="-0.005em"
+          textTransform="uppercase"
+          color="#FCF7F0"
+          textShadow="0 1px 12px rgba(0,0,0,0.25)"
+        >
+          {note.title}
+        </Text>
+      </Flex>
+
+      {/* Dato de la nota */}
+      {note.stat && (
+        <Flex
+          direction="column"
+          justify="center"
+          align="flex-start"
+          gap={{ base: '3px', md: '5px' }}
+          minW={{ md: '140px' }}
+          px={{ base: 3, md: 5 }}
+          py={{ base: '10px', md: 3 }}
+          borderRightRadius="10px"
+          color="brand.amber"
+          sx={glass('rgba(212,165,116,0.9)')}
+        >
+          <Text fontFamily="heading" fontWeight={700} fontSize={{ base: '24px', md: '36px' }} lineHeight={0.9} letterSpacing="-0.02em">
+            {note.stat.value}
           </Text>
-          <Text fontFamily="mono" fontSize="10px" color="brand.gray"
-            textTransform="uppercase" letterSpacing="0.18em" mt={0.5}>
-            {article.date}
+          <Text fontFamily="body" fontWeight={500} fontSize={{ base: '10px', md: '12px' }} lineHeight={1.1} maxW={{ base: '9ch', md: 'none' }}>
+            {note.stat.label}
           </Text>
-        </Box>
-      </HStack>
+        </Flex>
+      )}
     </Box>
   )
 }
 
 export default function PressSection() {
+  const press = playerData.press ?? []
+  const start = Math.max(0, press.findIndex((n) => n.featured))
+  const [active, setActive] = useState(start) // canal elegido
+  const [shown, setShown] = useState(start)   // nota pintada en pantalla
+  const [wiping, setWiping] = useState(false)
+  const timer = useRef(null)
+  const tabsRef = useRef(null)
+
   const sectionRef = useRef(null)
-  const titleRef   = useRef(null)
+  const headerRef = useRef(null)
 
   useScrubReveal(sectionRef, {
-    elements: [{ ref: titleRef, fromVars: { y: 50, opacity: 0 }, vars: { y: 0, opacity: 1 } }],
+    elements: [{ ref: headerRef, fromVars: { y: 50, opacity: 0 }, vars: { y: 0, opacity: 1 } }],
     start: 'top 80%',
-    end:   'top 40%',
+    end: 'top 40%',
   })
+
+  // Una sola entrada coordinada: pantalla y canales suben y aparecen juntos.
+  useEffect(() => {
+    const mm = gsap.matchMedia()
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      const ctx = gsap.context(() => {
+        const items = gsap.utils.toArray('.press-reveal')
+        gsap.fromTo(items, { opacity: 0, y: 32 }, {
+          opacity: 1, y: 0, duration: 1, ease: 'expo.out', stagger: 0.12,
+          scrollTrigger: { trigger: items[0], start: 'top 85%', once: true },
+        })
+      }, sectionRef)
+      return () => ctx.revert()
+    })
+    return () => mm.revert()
+  }, [])
+
+  useEffect(() => () => clearTimeout(timer.current), [])
+
+  // Con mouse o dedo: barrido del zócalo y fundido de la foto.
+  // Con teclado: cambio inmediato (es una acción repetida, tiene que sentirse al instante).
+  const select = (i, { animate = true } = {}) => {
+    if (i === active) return
+    setActive(i)
+    clearTimeout(timer.current)
+    if (!animate) { setWiping(false); setShown(i); return }
+    setWiping(true)
+    timer.current = setTimeout(() => { setShown(i); setWiping(false) }, SWAP_MS)
+  }
+
+  const onKeyDown = (e) => {
+    const d = { ArrowRight: 1, ArrowLeft: -1 }[e.key]
+    if (!d) return
+    e.preventDefault()
+    const n = (active + d + press.length) % press.length
+    select(n, { animate: false })
+    const tab = tabsRef.current?.children[n]
+    tab?.focus()
+    if (tabsRef.current && tab) tabsRef.current.scrollTo({ left: tab.offsetLeft - 16 })
+  }
+
+  if (!press.length) return null
+  const note = press[shown]
 
   return (
     <Box
       as="section"
       id="prensa"
       ref={sectionRef}
+      aria-labelledby="prensa-title"
       bg="brand.dark"
-      pb={{ base: 16, lg: 20 }}
-      pt={{ base: 2, lg: 12 }}
-      px={{ base: 5, lg: 10 }}
+      pt={{ base: 16, lg: 20 }}
+      pb={{ base: 16, lg: 24 }}
+      px={{ base: 4, md: 8, lg: 10 }}
+      sx={{ overflow: 'clip' }}
     >
       <Box maxW="1400px" mx="auto">
-        {/* Header */}
-        <Flex align="flex-end" justify="space-between" mb={4} ref={titleRef}>
+        <Flex ref={headerRef} justify="space-between" align="flex-end" gap={6} wrap="wrap">
           <Box>
-            <Text fontFamily="mono" fontSize={{base:'12px',md:"10px"}} color="brand.bone"
-                  textTransform="uppercase" letterSpacing="widest">
-              Testimonios
+            <Text fontFamily="mono" fontSize="10px" color="brand.bone" textTransform="uppercase" letterSpacing="0.28em">
+              Medios
             </Text>
-            <Text as="h2" fontFamily='heading' fontWeight="bold" fontSize={{ base: '4xl', lg: '5xl' }}
-                  color="brand.amber" lineHeight={1}>
+            <Text as="h2" id="prensa-title" fontFamily="heading" fontWeight="bold"
+                  fontSize={{ base: '4xl', lg: '5xl' }} color="brand.amber" lineHeight={1} mt={2}>
               Prensa
             </Text>
           </Box>
+          <Text maxW="44ch" fontFamily="body" fontSize={{ base: '13px', md: '14px' }} lineHeight={1.6} color="brand.gray">
+            Lo que se dijo de él en la Liga 1. Elegí un medio para ver su nota.
+          </Text>
         </Flex>
 
-        {/* Cards */}
-        <Grid templateColumns={{ base: '1fr', md: 'repeat(3, 1fr)' }} gap={6} mb={4}>
-          {playerData.press.map((article, i) => (
-            <PressCard key={article.title} article={article} index={i} />
-          ))}
-        </Grid>
+        {/* Pantalla */}
+        <Box
+          className="press-reveal"
+          id="prensa-pantalla"
+          role="tabpanel"
+          aria-labelledby={`prensa-canal-${active}`}
+          aria-live="polite"
+          position="relative"
+          mt={10}
+          w="100%"
+          maxH={{ lg: '78vh' }}
+          borderRadius="14px"
+          overflow="hidden"
+          bg="brand.amber"
+          sx={{ isolation: 'isolate', aspectRatio: { base: '4 / 5', md: '4 / 3', lg: '16 / 9' } }}
+        >
+          <Image
+            src={note.image}
+            alt={`${playerData.displayName}, foto de la nota de ${note.media}`}
+            position="absolute"
+            inset={0}
+            w="100%"
+            h="100%"
+            objectFit="cover"
+            objectPosition={note.pos ?? 'center'}
+            draggable={false}
+            sx={{
+              filter: wiping ? 'grayscale(1) blur(6px) brightness(.82)' : 'grayscale(1) contrast(1.08) brightness(.82)',
+              opacity: wiping ? 0 : 1,
+              transition: `opacity .45s ${EASE}, filter .45s ${EASE}`,
+              [REDUCED]: { filter: 'grayscale(1) brightness(.82)', transition: 'opacity .2s ease' },
+            }}
+          />
+          <Box position="absolute" inset={0} zIndex={1} pointerEvents="none"
+               bg="linear-gradient(180deg, transparent 60%, rgba(26,22,18,0.32) 100%)" />
+
+          <Flex position="absolute" top={{ base: 4, lg: '22px' }} left={{ base: 4, lg: 6 }} zIndex={2} align="center" gap={2}
+                px="11px" py="7px" borderRadius="6px" bg="rgba(26,22,18,0.6)" color="#FCF7F0">
+            <Box w="8px" h="8px" borderRadius="full" bg="brand.rec" />
+            <Text fontFamily="body" fontWeight={500} fontSize="12px" lineHeight={1}>{note.type}</Text>
+          </Flex>
+
+          <Zocalo note={note} wiping={wiping} />
+        </Box>
+
+        {/* Canales */}
+        <Box
+          ref={tabsRef}
+          className="press-reveal"
+          role="tablist"
+          aria-label="Medios"
+          onKeyDown={onKeyDown}
+          mt={3.5}
+          display="grid"
+          gridTemplateColumns={{ md: `repeat(${press.length}, 1fr)` }}
+          gridAutoFlow={{ base: 'column', md: 'row' }}
+          gridAutoColumns={{ base: '78%', md: 'auto' }}
+          gap="10px"
+          overflowX={{ base: 'auto', md: 'visible' }}
+          mr={{ base: -4, md: 0 }}
+          pr={{ base: 4, md: 0 }}
+          sx={{ scrollSnapType: 'x mandatory', scrollbarWidth: 'none', '&::-webkit-scrollbar': { display: 'none' } }}
+        >
+          {press.map((n, i) => {
+            const on = i === active
+            return (
+              <Box
+                key={n.url + i}
+                as="button"
+                type="button"
+                role="tab"
+                id={`prensa-canal-${i}`}
+                aria-selected={on}
+                aria-controls="prensa-pantalla"
+                tabIndex={on ? 0 : -1}
+                onClick={() => select(i)}
+                position="relative"
+                display="flex"
+                alignItems="center"
+                gap={3.5}
+                px="18px"
+                py={4}
+                textAlign="left"
+                borderRadius="12px"
+                border="1px solid"
+                borderColor={on ? 'brand.amber' : 'brand.amberLight'}
+                bg={on ? 'brand.amber' : 'brand.dark'}
+                color={on ? 'brand.dark' : 'brand.bone'}
+                scrollSnapAlign="start"
+                transition={`border-color .2s ease, background .2s ease, transform .16s ${EASE}`}
+                _active={{ transform: 'scale(0.97)' }}
+                _focusVisible={{ outline: '2px solid', outlineColor: 'brand.orange', outlineOffset: '3px' }}
+                _after={on ? {
+                  content: '""', position: 'absolute', left: '18px', right: '18px', top: '-1px', h: '3px',
+                  borderBottomRadius: '3px', bg: 'brand.dorado',
+                } : undefined}
+                sx={{ [HOVER]: on ? {} : { '&:hover': { borderColor: 'brand.amber' } } }}
+              >
+                <Image src={n.logo} alt="" boxSize="40px" objectFit="contain" borderRadius="8px" bg="white"
+                       border="1px solid" borderColor="brand.amberLight" p="3px" flexShrink={0} />
+                <Box minW={0}>
+                  <Text fontFamily="heading" fontWeight={700} fontSize="14px" lineHeight={1.1} noOfLines={1}>{n.media}</Text>
+                  <Text mt="5px" fontFamily="body" fontSize="12px" lineHeight={1} color={on ? 'brand.gray2' : 'brand.gray'}>
+                    {n.date}
+                  </Text>
+                </Box>
+              </Box>
+            )
+          })}
+        </Box>
       </Box>
     </Box>
   )
