@@ -4,59 +4,95 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-
     <!-- SEO básico -->
-     <link rel="icon" href="/favicon.svg " />
-    <title>Ivan Colman | Jugador Profesional </title>
-    <meta name="description" content="Sitio oficial de Ivan Colman, jugador profesional centrocampista de Cusco FC. Estadísticas, highlights, galería y contacto profesional." />
-    <meta name="keywords" content="Ivan Colman, jugador profesional, fútbol, goles, highlights" />
+    <title>Ivan Colman | Mediocentro y 10 de Cusco F.C.</title>
+    <meta name="description" content="Sitio oficial de Ivan Colman, mediocentro argentino y 10 de Cusco F.C. Estadísticas, videos, galería de fotos, notas de prensa y contacto de representación." />
     <meta name="author" content="Ivan Colman" />
-    <link rel="canonical" href="https://ivan-colman.netlify.app/" />
-    
-    <!-- Open Graph -->
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <link rel="canonical" href="https://ivancolman.com/" />
+    <meta name="theme-color" content="#FCF7F0" />
+
+    <!-- Íconos y manifest -->
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- Open Graph (WhatsApp, Facebook, LinkedIn) -->
     <meta property="og:type" content="profile" />
-    <meta property="og:title" content="Ivan Colman — Jugador Profesional" />
-    <meta property="og:description" content="Estadísticas, highlights y galería del jugador profesional Ivan Colman centrocampista de Cusco FC." />
-    <meta property="og:url" content="https://ivan-colman.netlify.app/" />
-    <meta property="og:image" content="https://ivan-colman.netlify.app/og-image.webp" />
-    <meta property="og:site_name" content="Ivan Colman — Sitio Oficial" />
-    <!-- <meta property="og:site_name" content="Ivan Colman — Sitio Oficial" /> -->
+    <meta property="og:site_name" content="Ivan Colman" />
+    <meta property="og:locale" content="es_AR" />
+    <meta property="og:url" content="https://ivancolman.com/" />
+    <meta property="og:title" content="Ivan Colman | Mediocentro y 10 de Cusco F.C." />
+    <meta property="og:description" content="Estadísticas, videos, fotos y prensa de Ivan Colman, mediocentro argentino y 10 de Cusco F.C. en la Liga 1." />
+    <meta property="og:image" content="https://ivancolman.com/og-image.jpg" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Ivan Colman con la camiseta de Cusco F.C., junto a su nombre y el número 10" />
+    <meta property="profile:first_name" content="Ivan" />
+    <meta property="profile:last_name" content="Colman" />
 
-    <!-- Twitter Card -->
+    <!-- X / Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Ivan Colman — Jugador Profesional" />
-    <meta name="twitter:description" content="Sitio oficial del jugador profesional Ivan Colman centrocampista de Cusco FC. Estadísticas, highlights y contacto." />
-    <meta name="twitter:image" content="https://ivan-colman.netlify.app/og-image.webp" />
+    <meta name="twitter:title" content="Ivan Colman | Mediocentro y 10 de Cusco F.C." />
+    <meta name="twitter:description" content="Estadísticas, videos, fotos y prensa de Ivan Colman, mediocentro argentino y 10 de Cusco F.C. en la Liga 1." />
+    <meta name="twitter:image" content="https://ivancolman.com/og-image.jpg" />
+    <meta name="twitter:image:alt" content="Ivan Colman con la camiseta de Cusco F.C., junto a su nombre y el número 10" />
 
-    <!-- Schema.org JSON-LD -->
+    <!-- Datos estructurados (Schema.org): sitio, página de perfil y persona -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "Person",
-      "name": "Ivan Colman",
-      "alternateName": "Ivan Colman",
-      "jobTitle": "Futbolista Profesional",
-      "description": "Centrocampista argentino que actualmente juega en Cusco FC, Liga 1." ,
-      "nationality": {
-        "@type": "Country",
-        "name": "Argentina"
-      },
-      "birthDate": "1994-12-03",
-      "birthPlace": {
-        "@type": "Place",
-        "name": "San Martin, Argentina"
-      },
-      "height": "1.73 m",
-      "weight": "70 kg",
-      "affiliation": {
-        "@type": "SportsTeam",
-        "name": "Cusco FC",
-        "sport": "Fútbol"
-      },
-      "url": "https://ivan-colman.netlify.app/",
-      "sameAs": [
-        "https://www.instagram.com/ivan.colman/",
-        "https://www.transfermarkt.com.ar/ivan-colman/profil/spieler/337921"
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "https://ivancolman.com/#website",
+          "url": "https://ivancolman.com/",
+          "name": "Ivan Colman",
+          "description": "Sitio oficial de Ivan Colman, mediocentro de Cusco F.C.",
+          "inLanguage": "es",
+          "publisher": { "@id": "https://ivancolman.com/#person" }
+        },
+        {
+          "@type": "ProfilePage",
+          "@id": "https://ivancolman.com/#profile",
+          "url": "https://ivancolman.com/",
+          "name": "Ivan Colman | Mediocentro y 10 de Cusco F.C.",
+          "inLanguage": "es",
+          "isPartOf": { "@id": "https://ivancolman.com/#website" },
+          "mainEntity": { "@id": "https://ivancolman.com/#person" },
+          "primaryImageOfPage": { "@type": "ImageObject", "url": "https://ivancolman.com/og-image.jpg", "width": 1200, "height": 630 },
+          "dateModified": "2026-11-16"
+        },
+        {
+          "@type": "Person",
+          "@id": "https://ivancolman.com/#person",
+          "name": "Ivan Colman",
+          "givenName": "Ivan",
+          "familyName": "Colman",
+          "jobTitle": "Futbolista profesional",
+          "description": "Mediocentro argentino, número 10 de Cusco F.C. en la Liga 1 de Perú.",
+          "url": "https://ivancolman.com/",
+          "image": "https://ivancolman.com/og-image.jpg",
+          "gender": "Male",
+          "birthDate": "1995-05-06",
+          "birthPlace": { "@type": "Place", "name": "San Martín, Argentina" },
+          "nationality": { "@type": "Country", "name": "Argentina" },
+          "height": { "@type": "QuantitativeValue", "value": 1.73, "unitCode": "MTR" },
+          "weight": { "@type": "QuantitativeValue", "value": 70, "unitCode": "KGM" },
+          "knowsAbout": "Fútbol",
+          "memberOf": {
+            "@type": "SportsTeam",
+            "name": "Cusco F.C.",
+            "sport": "Fútbol",
+            "location": { "@type": "Place", "name": "Cusco, Perú" }
+          },
+          "sameAs": [
+            "https://www.instagram.com/ivan_colman10/",
+            "https://www.transfermarkt.com.ar/ivan-colman/profil/spieler/380603"
+          ]
+        }
       ]
     }
     </script>
@@ -72,6 +108,20 @@
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      <main style="max-width:720px;margin:48px auto;padding:0 20px;font-family:system-ui,sans-serif;color:#1A1612;background:#FCF7F0;line-height:1.6">
+        <h1>Ivan Colman</h1>
+        <p>Mediocentro argentino y número 10 de Cusco F.C., en la Liga 1 de Perú. Nació en San Martín, Argentina; mide 1,73 m y es diestro.</p>
+        <p>Trayectoria: Boca Juniors (inferiores), Argentinos Juniors, Aldosivi, Sportivo Luqueño, Quilmes y Cusco F.C. Campeón de la Primera Nacional 2016/17 con Argentinos Juniors.</p>
+        <p>Este sitio necesita JavaScript para mostrar sus estadísticas, videos, galería y prensa.</p>
+        <ul>
+          <li><a href="https://www.instagram.com/ivan_colman10/">Instagram de Ivan Colman</a></li>
+          <li><a href="https://www.transfermarkt.com.ar/ivan-colman/profil/spieler/380603">Ficha en Transfermarkt</a></li>
+          <li><a href="https://www.instagram.com/moonsportsgroup_/">Representación deportiva: Moon Sports Group</a></li>
+          <li><a href="https://www.instagram.com/_ledsports/">Marketing y marcas: LED Sports Marketing</a></li>
+        </ul>
+      </main>
+    </noscript>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
