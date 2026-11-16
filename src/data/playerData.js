@@ -4,6 +4,8 @@ import { IoMdStats } from 'react-icons/io'
 
 //Hero
 import polaco1 from '@assets/polaco1.webp'
+//Estadísticas (recuadro destacado)
+import polaco2 from '@assets/polaco2.webp'
 
 import argentina from '@assets/argentina.webp'
 import cusco from '@assets/escudo_cusco.webp'
@@ -75,15 +77,21 @@ export const playerData = {
     { label: 'Visión de Juego',value: 91 },
   ],
 
+  // Estadísticas — diseño "Marcador":
+  //  featured → el número que mejor lo define (recuadro grande con recorte)
+  //  wide     → ocupa dos columnas · tone: 'gold' → recuadro dorado
+  //  order    → posición en tablet/mobile (grilla de 2 columnas, sin huecos)
   seasonStats: [
-    { label: 'Partidos',    value: 63},
-    { label: 'Goles',       value: 13},
-    { label: 'Asistencias', value: 21},
-    { label: 'Tiros al arco', value: 14},
-    { label: 'Min / Part.', value: "3,641'" },
-    { label: 'Valoración', value: 8.9},
-
+    { label: 'Asistencias',     value: 21, featured: true,
+      caption: 'Asistencias en la temporada',
+      text: 'El número que mejor lo define: hacer jugar al equipo.' },
+    { label: 'Partidos',        value: 63,       order: 1 },
+    { label: 'Minutos jugados', value: "3.641'", order: 3, wide: true },
+    { label: 'Valoración promedio', value: 8.9,  order: 4, tone: 'gold' },
+    { label: 'Goles',           value: 13,       order: 2 },
+    { label: 'Tiros al arco',   value: 14,       order: 5 },
   ],
+  featuredImage: polaco2,
 
   clubs: [
     {
@@ -92,10 +100,10 @@ export const playerData = {
       years: '2024 — Actualidad',
       logo: cusco,
       titles: [],
-      info: 'Jugador con más Asistencias - Temporada 2025',
+      info: 'Jugador con más asistencias · Temporada 2025',
     },
     {
-      name: 'C.A Quillmes',
+      name: 'Quilmes',
       country: 'Argentina',
       years: '2022 — 2023',
       logo: escudoQuilmes,
@@ -140,7 +148,8 @@ export const playerData = {
       years: '2014 — 2016',
       logo: escudoBoca,
       titles: [],
-      info: 'Inferiores',
+      info: '',
+      note: 'Inferiores',
     },
 
   ],
