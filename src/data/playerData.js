@@ -327,44 +327,47 @@ export const playerData = {
     },
   ],
 
+  // Contacto — diseño "Tarjetas":
+  //  socialMedia → una tarjeta por red (icon = ícono del chip y de la marca de agua, note = aclaración)
+  //  contact     → una tarjeta por representante (forWhom = "Escribile por…", cta = texto del botón)
   socialMedia: [
     {
       label: 'Instagram',
       icon: FaInstagram,
-      iconBg: FaInstagram,
       handle: '@ivan_colman8',
+      note: 'Su cuenta personal',
       url: 'https://www.instagram.com/ivan_colman8/',
       hoverColor: '#E1306C',
-      hoverGradient: 'insta-gradient',
     },
     {
-      label: 'TransferMarkt',
+      label: 'Transfermarkt',
+      icon: IoMdStats,
       image: transfermkt,
-      iconBg: IoMdStats,
       handle: '/ivan-colman',
+      note: 'Ficha y valor de mercado',
       url: 'https://www.transfermarkt.com.ar/ivan-colman/profil/spieler/380603',
-      hoverColor: '#2e73f2',
+      hoverColor: '#2E73F2',
     },
   ],
 
   contact: [
     {
-      title:      'Representante Deportivo',
-      label:      'Moon Sports Group',
-      image:       moon,
-      handle:     '@moonsportsgroup_',
-      url:        'https://www.instagram.com/moonsportsgroup_/',
-      hoverColor: 'rgba(19, 81, 139, 0.2)',
-      borderColor: 'rgb(19, 81, 139)',
+      title:   'Representación deportiva',
+      label:   'Moon Sports Group',
+      image:   moon,
+      handle:  '@moonsportsgroup_',
+      url:     'https://www.instagram.com/moonsportsgroup_/',
+      forWhom: 'clubes, intermediarios y propuestas deportivas.',
+      cta:     'Escribir a Moon Sports Group',
     },
     {
-      title:      'Contacto Marketing',
-      label:      'led sports marketing',
-      image: ledsports,
-      handle:     '@_ledsports',
-      url:        'https://www.instagram.com/_ledsports/',
-      hoverColor: 'rgba(212,168,75,0.18)',
-      borderColor: 'rgb(129, 103, 46)',
+      title:   'Marketing y marcas',
+      label:   'LED Sports Marketing',
+      image:   ledsports,
+      handle:  '@_ledsports',
+      url:     'https://www.instagram.com/_ledsports/',
+      forWhom: 'marcas, campañas, eventos y prensa.',
+      cta:     'Escribir a LED Sports',
     },
   ],
 }
