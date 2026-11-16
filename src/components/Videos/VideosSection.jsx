@@ -1,27 +1,114 @@
-import { useRef, useEffect, useState } from 'react'
-import { Box, Flex, Text, AspectRatio } from '@chakra-ui/react'
-import { AnimatePresence, motion } from 'framer-motion'
-import { FiX, FiChevronLeft, FiChevronRight } from 'react-icons/fi'
+import { useEffect, useRef, useState } from 'react'
+import { Box, Flex, Image, Text } from '@chakra-ui/react'
+import { keyframes } from '@emotion/react'
+import { FaInstagram } from 'react-icons/fa'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 import { playerData } from '../../data/playerData'
 import useScrubReveal from '../../hooks/useScrubReveal'
 import { VideoCard } from './VideoCard'
+import './videos.css'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const MotionBox = motion(Box)
+// ─── Videos: diseño "Programa" ──────────────────────────────────────
+// Un video "en pantalla" con su ficha y la lista para cambiarlo.
+//
+// Todo entra en el alto visible: en desktop el alto de la pantalla
+// (--screen-h) sale del alto del viewport (svh) menos la navbar, el padding y el
+// título, y la columna derecha toma ese mismo alto (si hubiera muchos
+// videos, la lista scrollea por dentro). En mobile el video se achica
+// para entrar completo en pantalla.
+
+const EASE = 'cubic-bezier(0.23,1,0.32,1)'
+const HOVER = '@media (hover: hover) and (pointer: fine)'
+
+const swapIn = keyframes`
+  from { opacity: 0; transform: translate3d(0, 10px, 0); }
+  to   { opacity: 1; transform: none; }
+`
+
+function Label({ children, ...rest }) {
+  return (
+    <Text fontFamily="mono" fontSize="10px" fontWeight={500} letterSpacing="0.2em"
+          textTransform="uppercase" color="brand.gray" lineHeight={1.3} {...rest}>
+      {children}
+    </Text>
+  )
+}
+
+function NowPlaying({ video }) {
+  const club = video.club ?? playerData.currentClub
+  const crest = video.clubLogo ?? playerData.logoCurrentClub
+  return (
+    <Box key={video.id} aria-live="polite"
+         sx={{ animation: `${swapIn} .5s ${EASE} both`, '@media (prefers-reduced-motion: reduce)': { animation: 'none' } }}>
+      <Flex align="center" gap={2}>
+        <Box w="8px" h="8px" borderRadius="full" bg="brand.rec" />
+        <Text fontFamily="mono" fontSize="11px" fontWeight={700} letterSpacing="0.2em" textTransform="uppercase" color="brand.bone">
+          En pantalla
+        </Text>
+      </Flex>
+      <Text as="h3" mt="var(--g1)" fontFamily="heading" fontWeight={700} textTransform="uppercase"
+            letterSpacing="-0.01em" lineHeight={0.95} color="brand.bone" fontSize="var(--title)">
+        {video.title}
+      </Text>
+      {video.text && (
+        <Text mt="var(--g1)" maxW="60ch" fontFamily="body" fontSize={{ base: '14px', md: '15px' }}
+              lineHeight={1.6} color="brand.gray" noOfLines={2}>
+          {video.text}
+        </Text>
+      )}
+
+      <Flex mt="var(--g2)" pt="var(--g2)" borderTop="1px solid" borderColor="brand.amberLight"
+            wrap="wrap" align="flex-end" gap={{ base: '18px 28px', md: '18px 40px' }}>
+        <Box>
+          <Label>Temporada</Label>
+          <Text mt={2} fontFamily="heading" fontWeight={700} fontSize="15px" color="brand.bone">{video.year}</Text>
+        </Box>
+        <Box>
+          <Label>Club</Label>
+          <Flex mt={2} align="center" gap={2} fontFamily="heading" fontWeight={700} fontSize="15px" color="brand.bone">
+            <Image src={crest} alt="" boxSize="20px" objectFit="contain" />{club}
+          </Flex>
+        </Box>
+        {video.league && (
+          <Box>
+            <Label>Torneo</Label>
+            <Text mt={2} fontFamily="heading" fontWeight={700} fontSize="15px" color="brand.bone">{video.league}</Text>
+          </Box>
+        )}
+        <Flex
+          as="a"
+          href={`https://www.instagram.com/reel/${video.instagramId}/`}
+          target="_blank"
+          rel="noopener noreferrer"
+          ml={{ md: 'auto' }}
+          align="center"
+          gap={2.5}
+          pb="6px"
+          borderBottom="1.5px solid"
+          borderColor="brand.dorado"
+          fontFamily="heading"
+          fontWeight={700}
+          fontSize="13px"
+          letterSpacing="0.06em"
+          color="brand.bone"
+          transition={`border-color .3s ${EASE}`}
+          _focusVisible={{ outline: '2px solid', outlineColor: 'brand.orange', outlineOffset: '4px' }}
+          sx={{ [HOVER]: { '&:hover': { borderColor: 'brand.amber' } } }}
+        >
+          <Box as={FaInstagram} boxSize="16px" />Abrir en Instagram
+        </Flex>
+      </Flex>
+    </Box>
+  )
+}
 
 export default function VideosSection() {
   const videos = playerData.videos
-
-  const ghostRef = useRef(null)
-  const wrapRef = useRef(null)
-  const sliderRef = useRef(null)
-
   const [active, setActive] = useState(0)
-  const [openVideo, setOpenVideo] = useState(null)
 
   const sectionRef = useRef(null)
   const headerRef = useRef(null)
@@ -32,278 +119,153 @@ export default function VideosSection() {
     end: 'top 40%',
   })
 
+  // Una sola entrada coordinada: pantalla y ficha suben y aparecen juntas.
   useEffect(() => {
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        headerRef.current,
-        { y: 40, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.9,
-          ease: 'power3.out',
-          scrollTrigger: { trigger: headerRef.current, start: 'top 85%', once: true },
-        }
-      )
-
-      const cards = gsap.utils.toArray('.video-card', wrapRef.current)
-      if (reduced) {
-        gsap.set(cards, { autoAlpha: 1, y: 0 })
-      } else {
-        gsap.fromTo(
-          cards,
-          { y: 55, autoAlpha: 0, rotateX: 6, transformPerspective: 1200 },
-          {
-            y: 0,
-            autoAlpha: 1,
-            rotateX: 0,
-            duration: 1.1,
-            ease: 'power3.out',
-            stagger: 0.12,
-            scrollTrigger: { trigger: wrapRef.current, start: 'top 82%', once: true },
-          }
-        )
-      }
-
-      if (!reduced && ghostRef.current) {
-        gsap.to(ghostRef.current, {
-          yPercent: -18,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: 'top bottom',
-            end: 'bottom top',
-            scrub: true,
-          },
+    const mm = gsap.matchMedia()
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      const ctx = gsap.context(() => {
+        const items = gsap.utils.toArray('.vid-reveal')
+        gsap.fromTo(items, { opacity: 0, y: 32 }, {
+          opacity: 1, y: 0, duration: 1, ease: 'expo.out', stagger: 0.12,
+          scrollTrigger: { trigger: items[0], start: 'top 85%', once: true },
         })
-      }
-    }, sectionRef)
-    return () => ctx.revert()
+      }, sectionRef)
+      return () => ctx.revert()
+    })
+    return () => mm.revert()
   }, [])
 
-  useEffect(() => {
-    if (!openVideo) return
-    const onKey = (e) => e.key === 'Escape' && setOpenVideo(null)
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [openVideo])
-
-  // slider mobile: detectar card activa según el scroll
-  const handleScroll = () => {
-    const el = sliderRef.current
-    if (!el || !el.children.length) return
-    const style = getComputedStyle(el)
-    const gap = parseFloat(style.columnGap || style.gap || '0') || 0
-    const itemW = el.children[0].offsetWidth + gap
-    if (!itemW) return
-    setActive(Math.round(el.scrollLeft / itemW))
-  }
-
-  const goTo = (i) => {
-    const el = sliderRef.current
-    el?.children[i]?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })
-  }
-
   if (!videos.length) return null
+  const video = videos[active]
 
   return (
     <Box
       as="section"
       id="videos"
       ref={sectionRef}
+      aria-labelledby="videos-title"
       position="relative"
-      minH="100vh"
       bg="brand.dark"
-      px={{ base: 2, md: 12, lg: 40 }}
-      pt={{ base: 20, md: '10%' }}
-      pb={{ base: 12, md: '10%' }}
-      overflow="hidden"
+      minH="calc(100 * var(--vh))"
+      px={{ base: 4, md: 8, lg: 10 }}
+      pt="var(--pad-t)"
+      pb="var(--pad-b)"
+      display="flex"
+      alignItems="center"
+      className="videos-programa"
+      sx={{ overflow: 'clip' }}
     >
-      {/* glows ambientales */}
-      <Box
-        position="absolute"
-        top={{ base: '10%', md: '-5%' }}
-        right="-12%"
-        w="55vw"
-        h="55vw"
-        background="radial-gradient(ellipse, rgba(189,167,142,0.16) 0%, transparent 70%)"
-        pointerEvents="none"
-      />
-
-      {/* número fantasma gigante (dorsal) */}
-      <Text
-        ref={ghostRef}
-        aria-hidden
-        position="absolute"
-        top={{ base: '10%', md: '12%' }}
-        right={{ base: '-15%', md: '8%' }}
-        fontFamily="heading"
-        fontSize={{ base: '80vw', md: '40vw' }}
-        lineHeight={0.8}
-        color="transparent"
-        pointerEvents="none"
-        userSelect="none"
-        zIndex={0}
-        sx={{ WebkitTextStroke: '1.5px rgba(189,167,142,0.14)' }}
-      >
-        {playerData.number}
-      </Text>
-
-      <Box maxW="1240px" mx="auto" position="relative" zIndex={1}>
-        {/* ── Header ── */}
-        <Flex direction="column" align="flex-start" justify="flex-start" ref={headerRef} mb={{ base: 8, md: 12 }} ml={{ base: 0, md: '-30px', lg: '-90px' }}>
-          <Text fontFamily='mono' fontSize="10px" color="brand.bone" textTransform="uppercase" letterSpacing="widest">
-            HIGHLIGHTS
+      <Box maxW="1400px" w="100%" mx="auto">
+        <Box ref={headerRef} mb="var(--head-gap)" h={{ md: 'var(--head)' }}>
+          <Text fontFamily="mono" fontSize="10px" color="brand.bone" textTransform="uppercase" letterSpacing="0.28em">
+            Highlights
           </Text>
-          <Text as="h2" fontFamily='heading' fontWeight="bold" fontSize={{ base: '4xl', lg: '5xl' }} color="brand.amber" lineHeight={1}>
+          <Text as="h2" id="videos-title" fontFamily="heading" fontWeight="bold"
+                fontSize={{ base: '4xl', lg: '5xl' }} color="brand.amber" lineHeight={1} mt={2}>
             Videos
           </Text>
-        </Flex>
+        </Box>
 
-        {/* ── Cards ── */}
-        <Box ref={wrapRef} position="relative" ml={{ base: 2, md: '0'}}>
-          {/* Desktop: en fila */}
-          <Flex display={{ base: 'none', md: 'flex' }} justify="center" align="stretch" gap={{ md: 5, lg: 12 }}>
-            {videos.map((v, i) => (
-              <Box key={v.id} flex="1 1 0" maxW={{ md: '300px', lg: '340px' }}>
-                <VideoCard video={v} index={i} onOpen={setOpenVideo} />
-              </Box>
-            ))}
-          </Flex>
-
-          {/* Mobile: slider con swipe */}
-          <Box display={{ base: 'block', md: 'none' }}>
-            <Flex
-              ref={sliderRef}
-              onScroll={handleScroll}
-              overflowX="auto"
-              scrollSnapType="x mandatory"
-              bg="transparent"
-              gap={4}
-              px="0%"
-              sx={{
-                scrollbarWidth: 'none',
-                '::-webkit-scrollbar': { display: 'none' },
-                WebkitOverflowScrolling: 'touch',
-              }}
-            >
-              {videos.map((v, i) => (
-                <Box key={v.id} flex="0 0 82%" scrollSnapAlign="center">
-                  <VideoCard video={v} index={i} onOpen={setOpenVideo} />
-                </Box>
-              ))}
-            </Flex>
-
-            {/* flechas indicadoras */}
-            <Flex justify="center" align="center" gap={5} mt={6}>
-              <Box
-                as="button"
-                aria-label="Video anterior"
-                onClick={() => goTo(active - 1)}
-                isDisabled={active === 0}
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-                color={active === 0 ? 'whiteAlpha.300' : 'brand.amber'}
-                pointerEvents={active === 0 ? 'none' : 'auto'}
-                transition="color 0.4s cubic-bezier(0.22,1,0.36,1), transform 0.4s cubic-bezier(0.22,1,0.36,1)"
-                _active={{ transform: 'translateX(-3px)' }}
-              >
-                <Box as={FiChevronLeft} fontSize="22px" />
-              </Box>
-
-              <Text fontFamily="mono" fontSize="11px" color="whiteAlpha.700" letterSpacing="wider" minW="42px" textAlign="center">
-                {String(active + 1).padStart(2, '0')} / {String(videos.length).padStart(2, '0')}
-              </Text>
-
-              <Box
-                as="button"
-                aria-label="Video siguiente"
-                onClick={() => goTo(active + 1)}
-                isDisabled={active === videos.length - 1}
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-                color={active === videos.length - 1 ? 'whiteAlpha.300' : 'brand.amber'}
-                pointerEvents={active === videos.length - 1 ? 'none' : 'auto'}
-                transition="color 0.4s cubic-bezier(0.22,1,0.36,1), transform 0.4s cubic-bezier(0.22,1,0.36,1)"
-                _active={{ transform: 'translateX(3px)' }}
-              >
-                <Box as={FiChevronRight} fontSize="22px" />
-              </Box>
-            </Flex>
+        <Box
+          display="grid"
+          gridTemplateColumns={{ base: '1fr', md: 'calc(var(--screen-h) * 9 / 16) minmax(0, 1fr)' }}
+          gap={{ base: 7, md: 10, lg: 16 }}
+          alignItems="start"
+        >
+          {/* Pantalla */}
+          <Box
+            className="vid-reveal"
+            w={{ base: 'var(--screen-w)', md: '100%' }}
+            mx={{ base: 'auto', md: 0 }}
+            h={{ md: 'var(--screen-h)' }}
+            sx={{ aspectRatio: '9 / 16' }}
+          >
+            <VideoCard video={video} index={active} />
           </Box>
+
+          {/* Ficha + lista: en desktop mide lo mismo que la pantalla */}
+          <Flex
+            className="vid-reveal"
+            direction="column"
+            minW={0}
+            h={{ lg: 'var(--screen-h)' }}
+          >
+            <NowPlaying video={video} />
+
+            <Flex justify="space-between" align="baseline" mt="var(--g2)" pb="var(--g1)"
+                  borderBottom="1px solid" borderColor="brand.amberLight" flexShrink={0}>
+              <Text as="h3" fontFamily="heading" fontWeight={700} fontSize={{ base: '14px', md: '15px' }}
+                    letterSpacing="0.24em" textTransform="uppercase" color="brand.bone">
+                Más videos
+              </Text>
+              <Label>{videos.length} videos</Label>
+            </Flex>
+
+            <Box as="ul" listStyleType="none" m={0} flex={{ lg: 1 }} minH={0}
+                 overflowY={{ lg: 'auto' }} sx={{ scrollbarWidth: 'thin' }}>
+              {videos.map((v, i) => {
+                const on = i === active
+                return (
+                  <Box as="li" key={v.id}>
+                    <Box
+                      as="button"
+                      type="button"
+                      onClick={() => setActive(i)}
+                      aria-current={on ? 'true' : undefined}
+                      aria-label={on ? `${v.title}, en pantalla` : `Poner en pantalla: ${v.title}`}
+                      w="100%"
+                      display="grid"
+                      gridTemplateColumns={{ base: '64px minmax(0,1fr) auto', md: 'calc(var(--thumb-h) * 0.8) minmax(0,1fr) auto' }}
+                      gap={{ base: 3.5, md: 5 }}
+                      alignItems="center"
+                      textAlign="left"
+                      py="var(--g1)"
+                      borderBottom="1px solid"
+                      borderColor="brand.amberLight"
+                      cursor="pointer"
+                      _focusVisible={{ outline: '2px solid', outlineColor: 'brand.orange', outlineOffset: '4px', borderRadius: '8px' }}
+                      sx={{
+                        '& .vi-thumb': { borderColor: on ? 'brand.orange' : 'transparent' },
+                        [HOVER]: on ? {} : {
+                          '&:hover .vi-thumb': { borderColor: 'brand.dorado' },
+                          '&:hover .vi-state': { color: 'brand.bone' },
+                        },
+                      }}
+                    >
+                      <Image
+                        className="vi-thumb"
+                        src={v.cover}
+                        alt=""
+                        w="100%"
+                        h={{ base: '80px', md: 'var(--thumb-h)' }}
+                        objectFit="cover"
+                        objectPosition={v.pos ?? 'center 35%'}
+                        borderRadius="8px"
+                        border="2px solid"
+                        transition={`border-color .3s ${EASE}`}
+                      />
+                      <Box minW={0}>
+                        <Text fontFamily="heading" fontWeight={700} fontSize={{ base: '16px', md: '18px', lg: '20px' }}
+                              lineHeight={1.05} textTransform="uppercase" color="brand.bone" noOfLines={1}>
+                          {v.title}
+                        </Text>
+                        <Text mt={2} fontFamily="mono" fontSize="10px" fontWeight={500} letterSpacing="0.14em"
+                              textTransform="uppercase" color="brand.gray" noOfLines={1}>
+                          {(v.club ?? playerData.currentClub)} · {v.league} {v.year}
+                        </Text>
+                      </Box>
+                      <Text className="vi-state" fontFamily="mono" fontSize="10px" fontWeight={700} letterSpacing="0.14em"
+                            textTransform="uppercase" color={on ? 'brand.rec' : 'brand.gray'} transition="color .3s">
+                        {on ? 'En pantalla' : 'Ver'}
+                      </Text>
+                    </Box>
+                  </Box>
+                )
+              })}
+            </Box>
+          </Flex>
         </Box>
       </Box>
-
-      {/* ── Modal fullscreen (embed de Instagram) ── */}
-      <AnimatePresence>
-        {openVideo && (
-          <MotionBox
-            position="fixed"
-            inset={0}
-            zIndex={2000}
-            bg="rgba(3,6,10,0.95)"
-            backdropFilter="blur(12px)"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-            p={{ base: 4, md: 12 }}
-            onClick={() => setOpenVideo(null)}
-          >
-            <Box
-              as="button"
-              position="absolute"
-              top={{ base: 16, md: 14 }}
-              right={{ base: 4, md: 60 }}
-              zIndex={2100}
-              aria-label="Cerrar video"
-              borderRadius="full"
-              p={1}
-              bg="brand.bgRef"
-              backdropFilter="blur(10px)"
-              color="white"
-              onClick={() => setOpenVideo(null)}
-              transition="color 0.3s ease, transform 0.3s ease"
-              _hover={{ color: 'brand.gray2', transform: 'rotate(90deg)' }}
-            >
-              <Box as={FiX} fontSize="32px" />
-            </Box>
-            <MotionBox
-              w="100%"
-              maxW={{ base: '100%', md: '420px' }}
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-              boxShadow="0 40px 120px rgba(0,0,0,0.7)"
-              borderRadius="16px"
-              overflow="hidden"
-              bg="#000"
-              mt={{ base: 0, md: '5%' }}
-            >
-              <AspectRatio ratio={{ base: 9 / 16, md: 9 / 15 }}>
-                <Box
-                  as="iframe"
-                  src={`https://www.instagram.com/reel/${openVideo.instagramId}/embed`}
-                  title={openVideo.fullTitle}
-                  border="none"
-                  scrolling="no"
-                  allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-                  referrerPolicy="strict-origin-when-cross-origin"
-                  allowFullScreen
-                  w="100%"
-                  h="100%"
-                />
-              </AspectRatio>
-            </MotionBox>
-          </MotionBox>
-        )}
-      </AnimatePresence>
     </Box>
   )
 }

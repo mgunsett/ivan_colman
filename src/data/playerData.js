@@ -33,6 +33,27 @@ import image13 from '@assets/gallery/image13.webp'
 import image14 from '@assets/gallery/image14.webp'
 import image15 from '@assets/gallery/image15.webp'
 import image16 from '@assets/gallery/image16.webp'
+import image17 from '@assets/gallery/image17.webp'
+import image18 from '@assets/gallery/image18.webp'
+import image19 from '@assets/gallery/image19.webp'
+import image21 from '@assets/gallery/image21.webp'
+import image22 from '@assets/gallery/image22.webp'
+import image23 from '@assets/gallery/image23.webp'
+import image24 from '@assets/gallery/image24.webp'
+import image25 from '@assets/gallery/image25.webp'
+import image27 from '@assets/gallery/image27.webp'
+import image28 from '@assets/gallery/image28.webp'
+import image29 from '@assets/gallery/image29.webp'
+import image30 from '@assets/gallery/image30.webp'
+import image31 from '@assets/gallery/image31.webp'
+import image32 from '@assets/gallery/image32.webp'
+import image33 from '@assets/gallery/image33.webp'
+import image34 from '@assets/gallery/image34.webp'
+import image35 from '@assets/gallery/image35.webp'
+import image36 from '@assets/gallery/image36.webp'
+import image37 from '@assets/gallery/image37.webp'
+import image38 from '@assets/gallery/image38.webp'
+import image39 from '@assets/gallery/image39.webp'
 //Video
 import photoGraph from '@assets/perfil_video.webp'
 //Prensa
@@ -47,6 +68,9 @@ import moon from '@assets/contact4.webp'
 
 const name = 'IVAN'
 const fullName = 'COLMAN'
+
+// Nombre para los textos alternativos de la galería
+const N = 'Ivan Colman'
 
 export const playerData = {
   name,
@@ -155,62 +179,108 @@ export const playerData = {
 
   ],
 
+  // Videos — diseño "Programa": uno en pantalla y la lista para cambiarlo.
+  //  title   → título grande · text → una línea de contexto
+  //  year / league / club → ficha del video (club: por defecto currentClub)
   videos: [
     {
       id: 'v2',
       instagramId: 'DPP_syMDWD5',
-      title: 'Asistencia',
-      fullTitle: 'Ivan Colman | Asistencias \'26',
-      season: 'Asistencias Cusco F.C.',
-      league: 'LIGA 1 2025',
-      thumbnail: image2,
+      title: 'Asistencias',
+      category: 'Asistencias',
+      text: 'Una por una, las asistencias que lo pusieron arriba en la Liga 1.',
+      year: 2025,
+      league: 'Liga 1',
       cover: image2,
-      category: 'Asistencia',
     },
     {
       id: 'v3',
       instagramId: 'DVjGHikDaUC',
-      title: 'Highlights \'25',
-      fullTitle: 'Ivan Colman | Highlights \'25',
-      season: 'Highlights Cusco F.C. \'25',
-      league: 'LIGA 1 2025',
-      thumbnail: image10,
-      cover: image10,
+      title: "Highlights '25",
       category: 'Highlights',
+      text: 'Jugadas destacadas de su temporada 2025 con Cusco F.C.',
+      year: 2025,
+      league: 'Liga 1',
+      cover: image10,
     },
-    
     {
       id: 'v4',
       instagramId: 'DCmfAbFpTpl',
-      title: 'Highlights \'24',
-      fullTitle: 'Ivan Colman | Highlights \'24',
-      season: 'Highlights Cusco F.C. \'24',
-      league: 'LIGA 1 2024',
-      thumbnail: image4,
-      cover: image4,
+      title: "Highlights '24",
       category: 'Highlights',
+      text: 'Su primera temporada en Cusco F.C., en la Liga 1 de Perú.',
+      year: 2024,
+      league: 'Liga 1',
+      cover: image4,
     },
   ],
 
-
-
-  gallery: [
-    { id: 1, src: image1, alt: 'Ivan Colman', caption: 'Cusco F.C.', category: 'Partido', aspect: 'wide' },
-    { id: 2, src: image2, alt: 'Ivan Colman', caption: 'Cusco F.C', category: 'Festejo', aspect: 'tall' },
-    { id: 3, src: image3, alt: 'Ivan Colman', caption: 'Cusco F.C', category: 'Entrenamiento', aspect: 'square' },
-    { id: 4, src: image4, alt: 'Ivan Colman', caption: 'Cusco F.C', category: 'Partido', aspect: 'wide' },
-    { id: 5, src: image5, alt: 'Ivan Colman', caption: 'Cusco F.C', category: 'Equipo', aspect: 'wide' },
-    { id: 6, src: image6, alt: 'Ivan Colman', caption: 'Cusco F.C', category: 'Retrato', aspect: 'tall' },
-    { id: 7, src: image7, alt: 'Ivan Colman', caption: 'Cusco F.C', category: 'Partido', aspect: 'wide' },
-    { id: 8, src: image8, alt: 'Ivan Colman', caption: 'Cusco F.C', category: 'Partido', aspect: 'wide' },
-    { id: 9, src: image9, alt: 'Ivan Colman', caption: 'Cusco F.C', category: 'Partido', aspect: 'wide' },
-    { id: 10, src: image10, alt: 'Ivan Colman', caption: 'Cusco F.C', category: 'Partido', aspect: 'wide' },
-    { id: 11, src: image11, alt: 'Ivan Colman', caption: 'Cusco F.C', category: 'Partido', aspect: 'wide' },
-    { id: 12, src: image12, alt: 'Ivan Colman', caption: 'Cusco F.C', category: 'Partido', aspect: 'wide' },
-    { id: 13, src: image13, alt: 'Ivan Colman', caption: 'Cusco F.C', category: 'Partido', aspect: 'wide' },
-    { id: 14, src: image14, alt: 'Ivan Colman', caption: 'Cusco F.C', category: 'Partido', aspect: 'wide' },
-    { id: 15, src: image15, alt: 'Ivan Colman', caption: 'Cusco F.C', category: 'Partido', aspect: 'wide' },
-    { id: 16, src: image16, alt: 'Ivan Colman', caption: 'Cusco F.C', category: 'Partido', aspect: 'wide' },
+  // Galería — diseño "Carriles": una fila por galería, todas a la vista.
+  //  shape → forma de la foto en el carril: 'tall' | 'square' | 'wide' (según su proporción)
+  //  pos   → objectPosition, para no cortar la cara
+  //  Las primeras fotos de cada galería son las que se ven sin deslizar: poner ahí las mejores.
+  galleries: [
+    {
+      key: 'cusco',
+      name: 'Cusco F.C.',
+      description: 'Liga 1 con Cusco F.C., desde 2024.',
+      logo: cusco,
+      photos: [
+      { src: image37, alt: `${N} festeja un gol con Cusco F.C.`, pos: 'center 28%', shape: 'tall' },
+      { src: image30, alt: `La camiseta 10 de ${N} en el vestuario de Cusco F.C.`, pos: 'center 22%', shape: 'tall' },
+      { src: image29, alt: `${N} hace un corazón con las manos al festejar`, pos: 'center 16%', shape: 'tall' },
+      { src: image32, alt: 'Formación de Cusco F.C. antes de un partido de la Liga 1', pos: 'center 45%', shape: 'square' },
+      { src: image28, alt: `${N} corre a festejar con los brazos abiertos`, pos: 'center 25%', shape: 'tall' },
+      { src: image1, alt: `Retrato de ${N} con la camiseta de Cusco F.C.`, pos: 'center 25%', shape: 'tall' },
+      { src: image31, alt: `${N} conduce la pelota con la camiseta blanca de Cusco F.C.`, pos: 'center 45%', shape: 'tall' },
+      { src: image35, alt: `${N} llega al estadio con Cusco F.C.`, pos: 'center 18%', shape: 'tall' },
+      { src: image33, alt: `${N} encara a un rival en la Liga 1`, pos: 'center 45%', shape: 'wide' },
+      { src: image2, alt: `${N} de espaldas con la 10 de Cusco F.C.`, pos: 'center 30%', shape: 'tall' },
+      { src: image36, alt: `${N} corre a buscar la pelota`, pos: 'center 40%', shape: 'wide' },
+      { src: image4, alt: `${N} en un partido de Cusco F.C.`, pos: 'center 30%', shape: 'tall' },
+      { src: image6, alt: `${N} en un partido de Cusco F.C.`, pos: 'center 30%', shape: 'tall' },
+      { src: image38, alt: `${N}, capitán de Cusco F.C., en el sorteo con el árbitro`, pos: 'center 35%', shape: 'wide' },
+      { src: image7, alt: `${N} en un partido de Cusco F.C.`, pos: 'center 30%', shape: 'tall' },
+      { src: image8, alt: `${N} en un partido de Cusco F.C.`, pos: 'center 30%', shape: 'tall' },
+      { src: image9, alt: `${N} en un partido de Cusco F.C.`, pos: 'center 30%', shape: 'tall' },
+      { src: image10, alt: `${N} en un partido de Cusco F.C.`, pos: 'center 30%', shape: 'square' },
+      { src: image11, alt: `${N} en un partido de Cusco F.C.`, pos: 'center 30%', shape: 'square' },
+      { src: image12, alt: `${N} en un partido de Cusco F.C.`, pos: 'center 30%', shape: 'tall' },
+      { src: image13, alt: `${N} en un partido de Cusco F.C.`, pos: 'center 30%', shape: 'tall' },
+      { src: image14, alt: `${N} en un partido de Cusco F.C.`, pos: 'center 30%', shape: 'tall' },
+      { src: image15, alt: `${N} en un partido de Cusco F.C.`, pos: 'center 30%', shape: 'tall' },
+      { src: image16, alt: `${N} en un partido de Cusco F.C.`, pos: 'center 30%', shape: 'tall' },
+      { src: image17, alt: `${N} en un partido de Cusco F.C.`, pos: 'center 30%', shape: 'square' },
+      { src: image18, alt: `${N} en un partido de Cusco F.C.`, pos: 'center 30%', shape: 'square' },
+      { src: image3, alt: `${N} en un partido de Cusco F.C.`, pos: 'center 30%', shape: 'tall' },
+      { src: image5, alt: `${N} en un partido de Cusco F.C.`, pos: 'center 30%', shape: 'wide' },
+      ],
+    },
+    {
+      key: 'libertadores',
+      name: 'Copa Libertadores',
+      description: 'Cusco F.C. ante Flamengo, por la Copa Libertadores.',
+      logo: cusco,
+      photos: [
+      { src: image34, alt: `${N} encara entre dos jugadores de Flamengo`, pos: 'center 45%', shape: 'wide' },
+      { src: image39, alt: `${N} con Cusco F.C. en la Copa Libertadores`, pos: 'center 22%', shape: 'tall' },
+      { src: image27, alt: `${N} le pega a la pelota ante la marca de un jugador de Flamengo`, pos: 'center 35%', shape: 'tall' },
+      { src: image19, alt: `${N} disputa la pelota ante Flamengo`, pos: 'center 40%', shape: 'square' },
+      ],
+    },
+    {
+      key: 'quilmes',
+      name: 'Quilmes',
+      description: 'Su etapa en Quilmes, entre 2022 y 2023.',
+      logo: escudoQuilmes,
+      photos: [
+      { src: image23, alt: `${N} patea un tiro de esquina con Quilmes`, pos: 'center 30%', shape: 'tall' },
+      { src: image21, alt: `${N} con la camiseta de Quilmes`, pos: 'center 35%', shape: 'wide' },
+      { src: image24, alt: `${N} en un partido de Quilmes`, pos: 'center 30%', shape: 'tall' },
+      { src: image22, alt: `${N} en un partido de Quilmes`, pos: 'center 40%', shape: 'wide' },
+      { src: image25, alt: `${N} en un partido de Quilmes`, pos: 'center 40%', shape: 'wide' },
+      ],
+    },
   ],
 
    press: [
