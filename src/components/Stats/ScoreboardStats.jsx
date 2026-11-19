@@ -1,5 +1,7 @@
 import { Box, Flex, Grid, Image, SimpleGrid, Text, useToken } from '@chakra-ui/react'
 import { playerData } from '../../data/playerData.js'
+import useSeasonStats from '../../hooks/useSeasonStats'
+import { seasonTiles } from '../../lib/seasonTiles'
 
 const HOVER = '@media (hover: hover) and (pointer: fine)'
 
@@ -246,10 +248,33 @@ function AttributesCard() {
   )
 }
 
+// Cómo se dibuja cada dato de la API en el marcador: el destacado
+// (Asistencias, con el texto de playerData), el ancho y el dorado.
+const STATIC_FEATURED = playerData.seasonStats.find((s) => s.featured)
+const TILE_STYLE = {
+  Partidos: { order: 1 },
+  Goles: { order: 2 },
+  Minutos: { label: 'Minutos jugados', order: 3, wide: true },
+  Valoración: { label: 'Valoración promedio', order: 4, tone: 'gold' },
+  'Pases clave': { order: 5 },
+  'Tiros al arco': { order: 5 },
+}
+
+function apiTiles(season) {
+  return seasonTiles(season).map((t) =>
+    STATIC_FEATURED && t.label === STATIC_FEATURED.label
+      ? { ...STATIC_FEATURED, value: t.value }
+      : { ...t, ...TILE_STYLE[t.label] }
+  )
+}
+
 // ─── Bloque principal ────────────────────────────────────────────
 export function ScoreboardStats() {
-  const featured = playerData.seasonStats.find((s) => s.featured)
-  const rest = playerData.seasonStats.filter((s) => !s.featured)
+  // Temporada en curso desde API-Football; sin datos, los valores fijos.
+  const season = useSeasonStats()
+  const items = season ? apiTiles(season) : playerData.seasonStats
+  const featured = items.find((s) => s.featured)
+  const rest = items.filter((s) => !s.featured)
 
   return (
     <Box>

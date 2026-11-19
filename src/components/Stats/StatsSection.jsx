@@ -3,6 +3,8 @@ import { Box, Flex, Text } from '@chakra-ui/react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import useScrubReveal from '../../hooks/useScrubReveal'
+import useSeasonStats from '../../hooks/useSeasonStats'
+import { seasonTitle } from '../../lib/seasonTiles'
 import { ScoreboardStats } from './ScoreboardStats.jsx'
 import { ClubsCards } from './ClubsCards.jsx'
 
@@ -13,6 +15,8 @@ gsap.registerPlugin(ScrollTrigger)
 // dossier, línea vertical) quedaron en el historial de git.
 
 export default function StatsSection() {
+  // Con totales de la API el título muestra sólo la temporada en curso.
+  const season = useSeasonStats()
   const sectionRef = useRef(null)
   const titleRef   = useRef(null)
 
@@ -69,7 +73,7 @@ export default function StatsSection() {
           <Box ref={titleRef}>
             <Text fontFamily="mono" fontSize="10px" color="brand.bone"
                   textTransform="uppercase" letterSpacing="0.28em">
-              Temporada 2025 / 2026
+              {seasonTitle(season, 'Temporada 2025 / 2026')}
             </Text>
             <Text as="h2" id="stats-title" fontFamily="heading" fontWeight="bold"
                   fontSize={{ base: '4xl', lg: '5xl' }} color="brand.amber" lineHeight={1} mt={2}>
